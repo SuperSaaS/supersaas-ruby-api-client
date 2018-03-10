@@ -1,15 +1,25 @@
 module Supersaas
   # REF: https://www.supersaas.com/info/dev/appointment_api
   class Appointments < BaseApi
-    def agenda(schedule_id, user_id, from_time=nil, slot=nil)
+    def agenda(schedule_id, user_id, from_time=nil)
+      path = "/agenda/#{validate_id(schedule_id)}"
+      params = {
+        user: validate_present(user_id),
+        from: from_time && validate_datetime(from_time)
+      }
+      res = client.get(path, params)
+      map_slots_or_bookings(res)
+    end
+
+    def agenda_slots(schedule_id, user_id, from_time=nil)
       path = "/agenda/#{validate_id(schedule_id)}"
       params = {
         user: validate_present(user_id),
         from: from_time && validate_datetime(from_time),
-        slot: slot ? true : nil
+        slot: true
       }
       res = client.get(path, params)
-      map_slots_or_bookings(res, slot)
+      map_slots_or_bookings(res, true)
     end
 
     def available(schedule_id, from_time, length_minutes=nil, resource=nil, full=nil, limit=nil)
@@ -106,14 +116,21 @@ module Supersaas
       client.delete(path)
     end
 
-    def changes(schedule_id, from_time, slot=nil)
+    def changes(schedule_id, from_time)
+      path = "/changes/#{validate_id(schedule_id)}"
+      params = { from: validate_datetime(from_time) }
+      res = client.get(path, params)
+      map_slots_or_bookings(res)
+    end
+
+    def changes_slots(schedule_id, from_time)
       path = "/changes/#{validate_id(schedule_id)}"
       params = {
         from: validate_datetime(from_time),
-        slot: slot ? true : nil
+        slot: true
       }
       res = client.get(path, params)
-      map_slots_or_bookings(res, slot)
+      map_slots_or_bookings(res, true)
     end
 
     private

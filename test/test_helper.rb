@@ -12,7 +12,7 @@ class SupersaasTest < Minitest::Test
   protected
 
   def client_instance
-    if !@client
+    if !defined? @client
       @client = Supersaas::Client.instance
       @client.account_name = 'accnt'
       @client.password = 'pwd'

@@ -40,6 +40,11 @@ module Supersaas
       assert_last_request_path "/api/agenda/#{@schedule_id}.json?user=#{@user_id}"
     end
 
+    def test_agenda_slots
+      refute_nil @client.appointments.agenda_slots(@schedule_id, @user_id).inspect
+      assert_last_request_path "/api/agenda/#{@schedule_id}.json?user=#{@user_id}&slot=true"
+    end
+
     def test_available
       from_time = Time.now
       refute_nil @client.appointments.available(@schedule_id, from_time)
@@ -60,9 +65,9 @@ module Supersaas
       assert_last_request_path "/api/changes/#{@schedule_id}.json?#{URI.encode_www_form(from: from)}"
     end
 
-    def test_changes_slot
+    def test_changes_slots
       from = Time.now
-      refute_nil @client.appointments.changes(@schedule_id, from, true)
+      refute_nil @client.appointments.changes_slots(@schedule_id, from)
       assert_last_request_path "/api/changes/#{@schedule_id}.json?#{URI.encode_www_form(from: from.strftime("%Y-%m-%d %H:%M:%S"))}&slot=true"
     end
 
