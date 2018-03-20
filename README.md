@@ -46,9 +46,9 @@ Initialize the SuperSaaS `Client` with authorization credentials:
       config.password = 'pwd'
     end
     
-> Note, ensure that `configure` is called before `instance`, otherwise the client will be initialized with configuration defaults.
+> Note, ensure that `configure` is called before `instance` or `new`, otherwise the client will be initialized with configuration defaults.
 
-If the client isn't configured explicitly, it will use default `ENV` variables for the account name, password, and user name.
+If the client isn't configured explicitly, it will use default `ENV` variables for the account name and password.
 
     ENV['SSS_API_ACCOUNT_NAME'] = 'your-env-supersaas-account-name'
     ENV['SSS_API_PASSWORD'] = 'your-env-supersaas-account-name' 
@@ -137,7 +137,7 @@ Get a single appointment by `schedule_id` and `appointment_id`:
 
 #### List Appointments/Bookings
 
-Get agenda (upcoming) appointments by `schedule_id` and `user_id`, with `form` and `slot` view params:
+List appointments by `schedule_id`, with `form` and `start_time` and `limit` view params:
 
     Supersaas::Client.instance.appointments.list(12345, 67890, true, true) #=> [<Supersaas::Appointment>, ...]
 
@@ -152,6 +152,8 @@ Get agenda (upcoming) appointments by `schedule_id` and `user_id`, with `from_ti
 Get agenda (upcoming) slots by `schedule_id` and `user_id`, with `from_time` view param:
 
     Supersaas::Client.instance.appointments.agenda_slots(12345, 67890, '2018-1-31 00:00:00') #=> [<Supersaas::Slot>, ...]    
+
+_Note: works only for capacity type schedules._
 
 #### Get Available Appointments/Bookings
 
