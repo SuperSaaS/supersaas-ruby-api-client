@@ -72,8 +72,8 @@ module Supersaas
     end
 
     def test_delete
-      refute_nil @client.appointments.delete(@appointment_id)
-      assert_last_request_path "/api/bookings/#{@appointment_id}.json"
+      refute_nil @client.appointments.delete(@schedule_id, @appointment_id)
+      assert_last_request_path "/api/bookings/#{@appointment_id}.json?schedule_id=#{@schedule_id}"
     end
 
     private

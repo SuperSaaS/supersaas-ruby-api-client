@@ -31,7 +31,7 @@ new_appointment_id = nil
 user = ENV['SSS_API_USER']
 if user
   description = '1234567890.'
-  params = {full_name: 'Example', description: description, name: 'example@example.com', email: 'example@example.com', mobile: '555-5555', phone: '555-5555', 'address': 'addr'}
+  params = {full_name: 'Example', description: description, name: 'example@example.com', email: 'example@example.com', mobile: '555-5555', phone: '555-5555', address: 'addr'}
   if show_slot
     params[:slot_id] = ENV['SSS_API_SLOT']
   else
@@ -58,8 +58,8 @@ appointments.each do |appointment|
     Supersaas::Client.instance.appointments.update(schedule_id, new_appointment_id, {country: 'FR', address: 'Rue 1'})
 
     puts "\n\rdeleting appointment..."
-    puts "\n\r#### Supersaas::Client.instance.appointments.delete(#{new_appointment_id})\n\r"
-    Supersaas::Client.instance.appointments.delete(new_appointment_id)
+    puts "\n\r#### Supersaas::Client.instance.appointments.delete(#{schedule_id}. #{new_appointment_id})\n\r"
+    Supersaas::Client.instance.appointments.delete(schedule_id, new_appointment_id)
     break
   end
 end

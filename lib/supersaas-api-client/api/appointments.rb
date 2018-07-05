@@ -111,9 +111,10 @@ module Supersaas
       client.put(path, params)
     end
 
-    def delete(appointment_id)
+    def delete(schedule_id, appointment_id)
       path = "/bookings/#{validate_id(appointment_id)}"
-      client.delete(path)
+      params = {schedule_id: validate_id(schedule_id)}
+      client.delete(path, nil, params)
     end
 
     def changes(schedule_id, from_time)
