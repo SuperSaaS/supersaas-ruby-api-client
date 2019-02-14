@@ -5,7 +5,7 @@ module Supersaas
     def setup
       @client = Supersaas::Client.instance
       @client.account_name = 'accnt'
-      @client.password = 'pwd'
+      @client.api_key = 'xxxxxxxxxxxxxxxxxxxxxx'
       @client.dry_run = true
       @schedule_id = 12345
       @appointment_id = 67890

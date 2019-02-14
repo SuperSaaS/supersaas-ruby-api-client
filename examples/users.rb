@@ -4,20 +4,20 @@ require "supersaas-api-client"
 
 puts "\n\r# SuperSaaS Users Example\n\r"
 
-unless Supersaas::Client.instance.account_name && Supersaas::Client.instance.password
+unless Supersaas::Client.instance.account_name && Supersaas::Client.instance.api_key
   puts "ERROR! Missing account credentials. Rerun the script with your credentials, e.g.\n\r"
-  puts "    SSS_API_ACCOUNT_NAME=<myaccountname> SSS_API_PASSWORD=<mypassword> ./examples/users.rb\n\r"
+  puts "    SSS_API_ACCOUNT_NAME=<myaccountname> SSS_API_KEY=<xxxxxxxxxxxxxxxxxxxxxx> ./examples/users.rb\n\r"
   return
 end
 
 puts "## Account:  #{Supersaas::Client.instance.account_name}"
-puts "## Password: #{'*' * Supersaas::Client.instance.password.size}\n\r"
+puts "## API Key: #{'*' * Supersaas::Client.instance.api_key.size}\n\r"
 
 Supersaas::Client.instance.verbose = true
 
 puts "creating new user..."
 puts "\n\r#### Supersaas::Client.instance.users.create({...})\n\r"
-params = {full_name: 'Example', name: 'example@example.com', email: 'example@example.com', password: 'example'}
+params = {full_name: 'Example', name: 'example@example.com', email: 'example@example.com', api_key: 'example'}
 Supersaas::Client.instance.users.create(params)
 new_user_id = nil
 
