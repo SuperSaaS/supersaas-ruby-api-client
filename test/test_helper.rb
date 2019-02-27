@@ -15,7 +15,7 @@ class SupersaasTest < Minitest::Test
     if !defined? @client
       @client = Supersaas::Client.instance
       @client.account_name = 'accnt'
-      @client.password = 'pwd'
+      @client.api_key = 'xxxxxxxxxxxxxxxxxxxxxx'
       @client.dry_run = true
     end
     @client

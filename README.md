@@ -7,7 +7,7 @@ The SuperSaaS API provides services that can be used to add online booking and s
 ## Prerequisites
 
 1. [Register for a (free) SuperSaaS account](https://www.supersaas.com/accounts/new), and
-2. get your account name and password.
+2. get your account name and API key on the [Account Info](https://www.supersaas.com/accounts/edit) page.
 
 ##### Dependencies
 
@@ -43,21 +43,21 @@ Initialize the SuperSaaS `Client` with authorization credentials:
 
     Supersaas::Client.configure do |config|
       config.account_name = 'accnt'
-      config.password = 'pwd'
+      config.api_key = 'xxxxxxxxxxxxxxxxxxxxxx'
     end
     
 > Note, ensure that `configure` is called before `instance` or `new`, otherwise the client will be initialized with configuration defaults.
 
-If the client isn't configured explicitly, it will use default `ENV` variables for the account name and password.
+If the client isn't configured explicitly, it will use default `ENV` variables for the account name and api key.
 
     ENV['SSS_API_ACCOUNT_NAME'] = 'your-env-supersaas-account-name'
-    ENV['SSS_API_PASSWORD'] = 'your-env-supersaas-account-name' 
+    ENV['SSS_API_KEY'] = 'your-env-supersaas-account-name' 
     Supersaas::Client.instance.account_name #=> 'your-env-supersaas-account-name'
-    Supersaas::Client.instance.password #=> 'your-env-supersaas-account-name'
+    Supersaas::Client.instance.api_key #=> 'your-env-supersaas-account-name'
     
 All configuration options can be individually set on the client.
 
-    Supersaas::Client.instance.password = 'pwd' 
+    Supersaas::Client.instance.api_key = 'xxxxxxxxxxxxxxxxxxxxxx' 
     Supersaas::Client.instance.verbose = true
     ...
 
@@ -189,12 +189,12 @@ Get a single form by `form_id`:
 
 The ./examples folder contains several executable Ruby scripts demonstrating how to use the API Client for common requests.
 
-The examples will require your account name, password, and some of the examples a schedule id and/or user id and/or form id. These can be set as environment variables. e.g.
+The examples will require your account name, api key, and some of the examples a schedule id and/or user id and/or form id. These can be set as environment variables. e.g.
 
     $ gem install supersaas-api-client
-    $ SSS_API_UID=myuserid SSS_API_SCHEDULE=myscheduleid SSS_API_ACCOUNT_NAME=myaccountname SSS_API_PASSWORD=mypassword ./examples/appointments.rb
-    $ SSS_API_FORM=myuserid SSS_API_ACCOUNT_NAME=myaccountname SSS_API_PASSWORD=mypassword ./examples/forms.rb 
-    $ SSS_API_ACCOUNT_NAME=myaccountname SSS_API_PASSWORD=mypassword ./examples/users.rb
+    $ SSS_API_UID=myuserid SSS_API_SCHEDULE=myscheduleid SSS_API_ACCOUNT_NAME=myaccountname SSS_API_KEY=xxxxxxxxxxxxxxxxxxxxxx ./examples/appointments.rb
+    $ SSS_API_FORM=myuserid SSS_API_ACCOUNT_NAME=myaccountname SSS_API_KEY=xxxxxxxxxxxxxxxxxxxxxx ./examples/forms.rb 
+    $ SSS_API_ACCOUNT_NAME=myaccountname SSS_API_KEY=xxxxxxxxxxxxxxxxxxxxxx ./examples/users.rb
 
 ## Testing
 

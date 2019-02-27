@@ -21,13 +21,13 @@ module Supersaas
       end
     end
 
-    attr_accessor :account_name, :password, :host, :dry_run, :verbose
+    attr_accessor :account_name, :api_key, :host, :dry_run, :verbose
     attr_reader :last_request
 
     def initialize(configuration=nil)
       configuration = configuration || Configuration.new
       @account_name = configuration.account_name
-      @password = configuration.password
+      @api_key = configuration.api_key
       @host = configuration.host
       @dry_run = configuration.dry_run
       @verbose = configuration.verbose
@@ -58,7 +58,7 @@ module Supersaas
 
     def request(http_method, path, params={}, query={})
       raise Supersaas::Exception.new("Account name not configured. Call `Supersaas::Client.configure`.") unless account_name && account_name.size
-      raise Supersaas::Exception.new("Account password not configured. Call `Supersaas::Client.configure`.") unless password && password.size
+      raise Supersaas::Exception.new("Account api key not configured. Call `Supersaas::Client.configure`.") unless api_key && api_key.size
 
       uri = URI.parse(host)
       http = Net::HTTP.new(uri.host, uri.port)
@@ -86,7 +86,7 @@ module Supersaas
         raise Supersaas::Exception.new("Invalid HTTP Method: #{http_method}. Only `:get`, `:post`, `:put`, `:delete` supported.")
       end
 
-      req.basic_auth account_name, password
+      req.basic_auth account_name, api_key
 
       req['Accept'] = 'application/json'
       req['Content-Type'] = 'application/json'
@@ -145,11 +145,11 @@ module Supersaas
     class Configuration
       DEFAULT_HOST = 'https://www.supersaas.com'
 
-      attr_accessor :account_name, :host, :password, :dry_run, :verbose
+      attr_accessor :account_name, :host, :api_key, :dry_run, :verbose
 
       def initialize
         @account_name = ENV['SSS_API_ACCOUNT_NAME']
-        @password = ENV['SSS_API_PASSWORD']
+        @api_key = ENV['SSS_API_KEY']
         @host = DEFAULT_HOST
         @dry_run = false
         @verbose = false

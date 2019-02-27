@@ -17,7 +17,7 @@ module Supersaas
 
     def test_request_methods
       @client.account_name = 'Test'
-      @client.password = 'testing123'
+      @client.api_key = 'testing123'
       [:get,:put,:post,:delete].each do |method|
         refute_nil @client.send(method, '/test')
         assert_equal method.to_s.upcase, @client.last_request.method
@@ -31,13 +31,13 @@ module Supersaas
     def test_instance_configuration
       Supersaas::Client.configure do |config|
         config.account_name = 'account'
-        config.password = 'password'
+        config.api_key = 'api_key'
         config.host = 'http://test'
         config.dry_run = true
         config.verbose = true
       end
       assert_equal 'account', Supersaas::Client.configuration.account_name
-      assert_equal 'password', Supersaas::Client.configuration.password
+      assert_equal 'api_key', Supersaas::Client.configuration.api_key
       assert_equal 'http://test', Supersaas::Client.configuration.host
       assert_equal true, Supersaas::Client.configuration.dry_run
       assert_equal true, Supersaas::Client.configuration.verbose
