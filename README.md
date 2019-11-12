@@ -145,13 +145,13 @@ List appointments by `schedule_id`, with `form` and `start_time` and `limit` vie
 
 Get agenda (upcoming) appointments by `schedule_id` and `user_id`, with `from_time` view param:
 
-    Supersaas::Client.instance.appointments.agenda(12345, 67890, '2018-1-31 00:00:00') #=> [<Supersaas::Appointment>, ...]
+    Supersaas::Client.instance.appointments.agenda(12345, 67890, '2018-01-31 00:00:00') #=> [<Supersaas::Appointment>, ...]
 
 #### Get Agenda Slots
 
 Get agenda (upcoming) slots by `schedule_id` and `user_id`, with `from_time` view param:
 
-    Supersaas::Client.instance.appointments.agenda_slots(12345, 67890, '2018-1-31 00:00:00') #=> [<Supersaas::Slot>, ...]    
+    Supersaas::Client.instance.appointments.agenda_slots(12345, 67890, '2018-01-31 00:00:00') #=> [<Supersaas::Slot>, ...]    
 
 _Note: works only for capacity type schedules._
 
@@ -159,25 +159,27 @@ _Note: works only for capacity type schedules._
 
 Get available appointments by `schedule_id`, with `from` time and `length_minutes` and `resource` params:
 
-    Supersaas::Client.instance.appointments.available(12345, '2018-1-31 00:00:00', 15, 'My Class') #=> [<Supersaas::Appointment>, ...]
+    Supersaas::Client.instance.appointments.available(12345, '2018-01-31 00:00:00', 15, 'My Class') #=> [<Supersaas::Appointment>, ...]
 
 #### Get Recent Changes
 
-Get recently changed appointments by `schedule_id`, with `from_time` view param:
+Get recently changed appointments by `schedule_id`, with `from` time, `to` time and `slot` view param:
 
-    Supersaas::Client.instance.appointments.changes(12345, '2018-1-31 00:00:00', true) #=> [<Supersaas::Appointment>, ...]
+    Supersaas::Client.instance.appointments.changes(12345, '2018-01-31 00:00:00', '2019-01-31 00:00:00',  true) #=> [<Supersaas::Appointment>, ...]
 
-#### Get Recent Changes Slots
 
-Get recently changed slots by `schedule_id`, with `from_time` view param:
+#### Get list of appointments
 
-    Supersaas::Client.instance.appointments.changes_slots(12345, '2018-1-31 00:00:00', true) #=> [<Supersaas::Slot>, ...]
+Get list of appointments by `schedule_id`, with `today`,`from` time, `to` time and `slot` view param:
+
+    Supersaas::Client.instance.appointments.range(12345, false, '2018-01-31 00:00:00', '2019-01-31 00:00:00', true) #=> [<Supersaas::Appointment>, ...]/[<Supersaas::Slot>, ...]
+
 
 #### List Template Forms
 
 Get all forms by template `superform_id`, with `from_time` param:
 
-    Supersaas::Client.instance.forms.list(12345, '2018-1-31 00:00:00') #=> [<Supersaas::Form>, ...]
+    Supersaas::Client.instance.forms.list(12345, '2018-01-31 00:00:00') #=> [<Supersaas::Form>, ...]
 
 #### Get Form
 
