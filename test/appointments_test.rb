@@ -65,10 +65,10 @@ module Supersaas
       assert_last_request_path "/api/changes/#{@schedule_id}.json?#{URI.encode_www_form(from: from)}"
     end
 
-    def test_changes_slots
-      from = Time.now
-      refute_nil @client.appointments.changes_slots(@schedule_id, from)
-      assert_last_request_path "/api/changes/#{@schedule_id}.json?#{URI.encode_www_form(from: from.strftime("%Y-%m-%d %H:%M:%S"))}&slot=true"
+    def test_range
+      from = "2017-01-31 14:30:00"
+      refute_nil @client.appointments.range(@schedule_id, false, from)
+      assert_last_request_path "/api/range/#{@schedule_id}.json?#{URI.encode_www_form(from: from)}"
     end
 
     def test_delete

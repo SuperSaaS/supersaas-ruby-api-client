@@ -121,6 +121,10 @@ module Supersaas
         json_body(res)
       when 422, 400
         json_body(res)
+      when 401
+        raise Supersaas::Exception.new("HTTP Request Error: Unauthorised")
+      when 404
+        raise Supersaas::Exception.new("HTTP Request Error: Not Found")
       else
         {}
       end

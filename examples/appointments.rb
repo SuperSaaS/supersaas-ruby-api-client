@@ -73,7 +73,7 @@ end
 
 puts "\n\rlisting changes..."
 from = DateTime.now - 120
-puts "\n\r#### Supersaas::Client.instance.appointments.changes(#{schedule_id}, '#{from.strftime("%Y-%m-%d %H:%M:%S")}', #{show_slot || 'false'})\n\r"
+puts "\n\r#### Supersaas::Client.instance.appointments.changes(#{schedule_id}, '#{from.strftime("%Y-%m-%d %H:%M:%S")}', '#{to.strftime("%Y-%m-%d %H:%M:%S")}',  #{show_slot || 'false'})\n\r"
 
 Supersaas::Client.instance.appointments.changes(schedule_id, from, show_slot)
 
