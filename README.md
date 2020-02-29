@@ -85,7 +85,7 @@ _Note: does not work for capacity type schedules._
 
 Create a user with user attributes params:
 
-    Supersaas::Client.instance.users.create({name: 'name@name.com', full_name: 'Example Name', email: 'example@example.com'}) #=> nil
+    Supersaas::Client.instance.users.create({name: 'name@name.com', full_name: 'Example Name', email: 'example@example.com'}) #=> http://www.supersaas.com/api/users/12345.json
 
 #### Update User
 
@@ -115,7 +115,7 @@ Get all users with optional `form` and `limit`/`offset` pagination params:
 
 Create an appointment by `schedule_id` and `user_id` with appointment attributes and `form` and `webhook` params:
 
-    Supersaas::Client.instance.appointments.create(12345, 67890, {full_name: 'Example Name', email: 'example@example.com', slot_id: 12345}, true, true) #=> nil
+    Supersaas::Client.instance.appointments.create(12345, 67890, {full_name: 'Example Name', email: 'example@example.com', slot_id: 12345}, true, true) #=> http://www.supersaas.com/api/bookings/12345.json
 
 #### Update Appointment/Booking
 
@@ -239,9 +239,6 @@ Validation errors are assigned to the response model. e.g.
 + [Python API Client](https://github.com/SuperSaaS/supersaas-python-api-client)
 + [PHP API Client](https://github.com/SuperSaaS/supersaas-php-api-client)
 + [NodeJS API Client](https://github.com/SuperSaaS/supersaas-nodejs-api-client)
-+ [C# API Client](https://github.com/SuperSaaS/supersaas-csharp-api-client)
-+ [Objective-C API Client](https://github.com/SuperSaaS/supersaas-objc-api-client)
-+ [Go API Client](https://github.com/SuperSaaS/supersaas-go-api-client)
 
 Contact: [support@supersaas.com](mailto:support@supersaas.com)
 
