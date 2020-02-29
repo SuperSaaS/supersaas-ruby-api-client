@@ -85,7 +85,7 @@ _Note: does not work for capacity type schedules._
 
 Create a user with user attributes params:
 
-    Supersaas::Client.instance.users.create({full_name: 'Example Name', email: 'example@example.com'}) #=> nil
+    Supersaas::Client.instance.users.create({name: 'name@name.com', full_name: 'Example Name', email: 'example@example.com'}) #=> nil
 
 #### Update User
 
