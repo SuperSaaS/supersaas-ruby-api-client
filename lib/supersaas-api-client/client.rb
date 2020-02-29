@@ -118,7 +118,11 @@ module Supersaas
       code = res.code.to_i
       case code
       when 200, 201
-        json_body(res)
+        if http_method == :post && res['location'] =~ /www.supersaas.com/
+          res['location']
+        else
+          json_body(res)
+        end
       when 422, 400
         json_body(res)
       when 401
