@@ -11,15 +11,6 @@ class SupersaasTest < Minitest::Test
 
   protected
 
-  def client_dev_instance
-    Supersaas::Client.configure do |config|
-      config.host = "http://localhost:3000"
-      config.account_name = 'ajm'
-      config.api_key = 'gTYCUIw8KF4Jzk2bl3uf4A'
-    end
-    Supersaas::Client.instance
-  end
-
   def client_instance
     if !defined? @client
       @client = Supersaas::Client.instance
