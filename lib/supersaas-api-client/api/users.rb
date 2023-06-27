@@ -23,7 +23,7 @@ module Supersaas
       query = {webhook: webhook}
       params = {
         user: {
-          name: validate_present(attributes[:name]),
+          name: validate_present(attributes[:name], :name),
           email: attributes[:email],
           password: attributes[:password],
           full_name: attributes[:full_name],

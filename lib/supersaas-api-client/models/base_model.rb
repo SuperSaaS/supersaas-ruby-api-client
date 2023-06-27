@@ -12,6 +12,7 @@ module Supersaas
 
     def assign_attributes(attributes)
       attributes.each do |key, value|
+        self.class.module_eval { attr_accessor key }
         public_send("#{key}=", value) if respond_to?("#{key}=")
       end
     end

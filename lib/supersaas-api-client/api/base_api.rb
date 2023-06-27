@@ -22,11 +22,11 @@ module Supersaas
     end
     def validate_number(value); validate_id(value); end
 
-    def validate_present(value)
+    def validate_present(value, name = nil)
       if value.is_a?(String) ? value.size : value
         value
       else
-        raise Supersaas::Exception.new("Required parameter is missing.")
+        raise Supersaas::Exception.new("Required parameter '#{name}' is missing.")
       end
     end
 
