@@ -111,13 +111,14 @@ module Supersaas
 
       if verbose
         puts "Response:"
+        puts res.inspect
         puts res.body
         puts "=============================="
       end
 
       code = res.code.to_i
       case code
-      when 200, 201
+      when 200...300
         if http_method == :post && res['location'] =~ /www.supersaas.com/
           res['location']
         else
@@ -129,7 +130,7 @@ module Supersaas
         raise Supersaas::Exception.new("HTTP Request Error: Unauthorised")
       when 404
         raise Supersaas::Exception.new("HTTP Request Error: Not Found")
-      else
+      else # everything else exception !? 
         {}
       end
     end
