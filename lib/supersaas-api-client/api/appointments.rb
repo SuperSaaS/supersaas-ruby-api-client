@@ -92,7 +92,7 @@ module Supersaas
         booking: {
           start: attributes[:start],
           finish: attributes[:finish],
-          name: validate_present(attributes[:name], :name),
+          name: attributes[:name],
           email: attributes[:email],
           full_name: attributes[:full_name],
           address: attributes[:address],
