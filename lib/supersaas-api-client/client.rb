@@ -59,7 +59,7 @@ module Supersaas
     def throttle
       @q ||= Array.new(2)
       previous_request = @q.push(Time.now).shift
-      if previous_request && (d=Time.now- previous_request) < 1 then sleep d end
+      if previous_request && (d = Time.now - previous_request) < 1 then sleep 1 - d end
     end
 
     def request(http_method, path, params={}, query={})
