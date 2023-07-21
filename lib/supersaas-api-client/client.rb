@@ -56,8 +56,8 @@ module Supersaas
 
     private
 
-    WINDOW_SIZE = 5
-    MAX_PER_WINDOW = 20
+    WINDOW_SIZE = 1
+    MAX_PER_WINDOW = 4
     def throttle
       @q ||= Array.new(MAX_PER_WINDOW)
       previous_request = @q.push(Time.now).shift
