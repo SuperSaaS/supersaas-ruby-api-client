@@ -56,10 +56,12 @@ module Supersaas
 
     private
 
+    WINDOW_SIZE = 5
+    MAX_PER_WINDOW = 20
     def throttle
-      @q ||= Array.new(2)
+      @q ||= Array.new(MAX_PER_WINDOW)
       previous_request = @q.push(Time.now).shift
-      if previous_request && (d = Time.now - previous_request) < 1 then sleep 1 - d end
+      if previous_request && (d = Time.now - previous_request) < WINDOW_SIZE then sleep WINDOW_SIZE - d end
     end
 
     def request(http_method, path, params={}, query={})
