@@ -56,10 +56,9 @@ module Supersaas
 
     private
 
-    @previous_request = nil
     def throttle
-      sleep 1 if @previous_request && (Time.now - @previous_request) < 60
-      @previous_request=Time.now
+      sleep 1 if @previous_request && (Time.now - @previous_request) < 1
+      @previous_request = Time.now
     end
 
     def request(http_method, path, params={}, query={})
