@@ -56,12 +56,18 @@ module Supersaas
 
     private
 
-    WINDOW_SIZE = 1
-    MAX_PER_WINDOW = 4
+    WINDOW_SIZE = 1 
+    # The rate limiter allows a maximum of 4 requests to be made within the specified time window, which is defined by the WINDOW_SIZE constant.
+    MAX_PER_WINDOW = 4 
     def throttle
+      # A queue to store timestamps of requests made within the rate limiting window
       @q ||= Array.new(MAX_PER_WINDOW)
-      previous_request = @q.push(Time.now).shift
-      if previous_request && (d = Time.now - previous_request) < WINDOW_SIZE then sleep WINDOW_SIZE - d end
+      # Represents the timestamp of the oldest request within the time window
+      oldest_request = @q.push(Time.now).shift
+      # This ensures that the client does not make requests faster than the defined rate limit
+      if oldest_request && (d = Time.now - oldest_request) < WINDOW_SIZE
+        sleep WINDOW_SIZE - d
+      end
     end
 
     def request(http_method, path, params={}, query={})
