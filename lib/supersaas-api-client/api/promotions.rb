@@ -14,7 +14,7 @@ module Supersaas
       path = "/promotions"
       query = {promotion_code: validate_promotion(promotion_code)}
       res = client.get(path, query)
-      res.map { |attributes| Supersaas::Schedule.new(attributes) }
+      res.map { |attributes| Supersaas::Promotion.new(attributes) }
     end
 
     def duplicate_promotion_code(promotion_code, template_code)

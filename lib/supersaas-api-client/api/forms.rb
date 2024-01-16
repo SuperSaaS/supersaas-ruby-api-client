@@ -1,7 +1,7 @@
 module Supersaas
   # REF: https://www.supersaas.com/info/dev/form_api
   class Forms < BaseApi
-    def forms(template_form_id, from_time=nil, user=nil)
+    def list(template_form_id, from_time=nil, user=nil)
       path = "/forms"
       params = {
         form_id: validate_id(template_form_id),
@@ -19,7 +19,7 @@ module Supersaas
       Supersaas::Form.new(res)
     end
 
-    def list
+    def forms
       path = "/super_forms"
       res = client.get(path)
       res.map { |attributes| Supersaas::SuperForm.new(attributes) }

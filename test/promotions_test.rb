@@ -11,6 +11,7 @@ module Supersaas
       refute_nil @client.promotions.promotion(@promotion_code)
       assert_last_request_path "/api/promotions.json?promotion_code=abc123"
     end
+
     def test_list
       refute_nil @client.promotions.list
       assert_last_request_path "/api/promotions.json"

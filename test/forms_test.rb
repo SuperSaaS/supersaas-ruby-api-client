@@ -8,14 +8,14 @@ module Supersaas
       @form_id = 67890
     end
 
-    def test_forms
+    def test_list
       from = Time.now
-      refute_nil @client.forms.forms(@super_form_id, from.strftime("%Y-%m-%d %H:%M:%S"))
+      refute_nil @client.forms.list(@super_form_id, from.strftime("%Y-%m-%d %H:%M:%S"))
       assert_last_request_path "/api/forms.json?form_id=#{@super_form_id}&#{URI.encode_www_form(from: from.strftime("%Y-%m-%d %H:%M:%S"))}"
     end
 
-    def test_list
-      refute_nil @client.forms.list
+    def test_forms
+      refute_nil @client.forms.forms
       assert_last_request_path "/api/super_forms.json"
     end
 
