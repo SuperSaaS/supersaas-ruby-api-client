@@ -45,6 +45,11 @@ module Supersaas
       assert_last_request_path "/api/users/#{@user_id}.json"
     end
 
+    def test_field_list
+      refute_nil @client.users.field_list
+      assert_last_request_path "/api/field_list.json"
+    end
+
     private
 
     def user_attributes

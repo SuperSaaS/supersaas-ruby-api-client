@@ -73,6 +73,7 @@ end
 
 puts "\n\rlisting changes..."
 from = DateTime.now - 120
+to = DateTime.now + 360000
 puts "\n\r#### Supersaas::Client.instance.appointments.changes(#{schedule_id}, '#{from.strftime("%Y-%m-%d %H:%M:%S")}', '#{to.strftime("%Y-%m-%d %H:%M:%S")}',  #{show_slot || 'false'})\n\r"
 
 Supersaas::Client.instance.appointments.changes(schedule_id, from, show_slot)
@@ -82,3 +83,9 @@ from = DateTime.now
 puts "\n\r#### Supersaas::Client.instance.appointments.available(#{schedule_id}, '#{from.strftime("%Y-%m-%d %H:%M:%S")}')\n\r"
 
 Supersaas::Client.instance.appointments.available(schedule_id, from)
+
+puts "\n\rAppointments for a single user..."
+user = Supersaas::Client.instance.users.list(nil, 1).first
+from = DateTime.now
+puts "\n\r#### Supersaas::Client.instance.appointments.agenda(#{schedule_id}, user.id, '#{from.strftime("%Y-%m-%d %H:%M:%S")}')\n\r"
+Supersaas::Client.instance.appointments.agenda(schedule_id, user.id, from.strftime("%Y-%m-%d %H:%M:%S"))

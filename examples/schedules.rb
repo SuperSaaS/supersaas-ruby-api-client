@@ -2,7 +2,7 @@
 
 require "supersaas-api-client"
 
-puts "\n\r# SuperSaaS Schedules Example\n\r"
+puts "\n\r# SuperSaaS Information Example\n\r"
 
 unless Supersaas::Client.instance.account_name && Supersaas::Client.instance.api_key
   puts "ERROR! Missing account credentials. Rerun the script with your credentials, e.g.\n\r"
@@ -20,8 +20,14 @@ puts "\n\r#### Supersaas::Client.instance.schedules.list\n\r"
 schedules = Supersaas::Client.instance.schedules.list
 
 puts "\n\rlisting schedule resources..."
-[10, schedules.size].min.times do |i|
+[10, schedules.size].min&.times do |i|
   puts "\n\r#### Supersaas::Client.instance.schedules.resources(#{schedules[i].id})\n\r"
   Supersaas::Client.instance.schedules.resources(schedules[i].id)
+end
+
+puts "puts \n\rlisting fields..."
+[10, schedules.size].min&.times do |i|
+  puts "\n\r#### Supersaas::Client.instance.schedules.field_list(#{schedules[i].id})\n\r"
+  Supersaas::Client.instance.schedules.field_list(schedules[i].id)
 end
 puts

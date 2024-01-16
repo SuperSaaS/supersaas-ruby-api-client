@@ -4,6 +4,7 @@ module Supersaas
 
     INTEGER_REGEX = /\A[0-9]+\Z/
     DATETIME_REGEX = /\A\d{4}-\d{1,2}-\d{1,2}\s\d{1,2}:\d{1,2}:\d{1,2}\Z/
+    PROMOTION_REGEX = /\A[0-9a-zA-Z]+\Z/
 
     def initialize(client)
       @client = client
@@ -22,11 +23,43 @@ module Supersaas
     end
     def validate_number(value); validate_id(value); end
 
-    def validate_present(value, name = nil)
-      if value.is_a?(String) ? value.size : value
+    def validate_name(value)
+      if value.nil? || value.is_a?(String) && value.size
         value
       else
-        raise Supersaas::Exception.new("Required parameter '#{name}' is missing.")
+        raise Supersaas::Exception.new("Required parameter name is missing.")
+      end
+    end
+
+    def validate_present(value)
+      if value
+        value
+      else
+        raise Supersaas::Exception.new("Required parameter is missing.")
+      end
+    end
+
+    def validate_notfound(value)
+      if value.is_a?(String) && (value == 'error' || value == 'ignore')
+        value
+      else
+        raise Supersaas::Exception.new("Required parameter notfound can only be 'error' or 'ignore'.")
+      end
+    end
+
+    def validate_promotion(value)
+      if value.is_a?(String) && value.size && value =~ PROMOTION_REGEX
+        value
+      else
+        raise Supersaas::Exception.new("Required parameter promotional code not found or contains other than alphanumeric characters.")
+      end
+    end
+
+    def validate_duplicate(value)
+      if value.is_a?(String) && value == 'raise'
+        value
+      else
+        raise Supersaas::Exception.new("Required parameter duplicate can only be 'raise'.")
       end
     end
 

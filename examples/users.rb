@@ -26,7 +26,7 @@ puts "\n\r#### Supersaas::Client.instance.users.list(nil, 50)\n\r"
 
 users = Supersaas::Client.instance.users.list(nil, 50)
 users.each do |user|
-  new_user_id = user.id if user.name == params[:email] || user.email == params[:email]
+  new_user_id = user.id if user.name == params[:email]
 end
 
 if new_user_id
@@ -48,4 +48,8 @@ end
 puts "\n\rcreating user with errors..."
 puts "\n\r#### Supersaas::Client.instance.users.create\n\r"
 Supersaas::Client.instance.users.create({name: 'error'})
+puts
+
+puts "\n\r#### Supersaas::Client.instance.users.field_list\n\r"
+Supersaas::Client.instance.users.field_list
 puts

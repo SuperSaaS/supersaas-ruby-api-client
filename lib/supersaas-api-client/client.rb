@@ -37,6 +37,8 @@ module Supersaas
     def forms; @forms ||= Forms.new(self); end
     def schedules; @schedules ||= Schedules.new(self); end
     def users; @users ||= Users.new(self); end
+    def promotions; @promotions ||= Promotions.new(self); end
+    def groups; @groups ||= Groups.new(self); end
 
     def get(path, query={})
       request(:get, path, {}, query)
@@ -133,7 +135,7 @@ module Supersaas
 
       code = res.code.to_i
       case code
-      when 200...300
+      when 200, 201
         if http_method == :post && res['location'] =~ /www.supersaas.com/
           res['location']
         else

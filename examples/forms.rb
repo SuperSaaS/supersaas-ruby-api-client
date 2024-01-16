@@ -25,15 +25,19 @@ else
 end
 
 puts "\n\rlisting forms..."
-puts "\n\r#### Supersaas::Client.instance.forms.list(#{form_id})\n\r"
+puts "\n\r#### Supersaas::Client.instance.forms.forms(#{form_id})\n\r"
 
-forms = Supersaas::Client.instance.forms.list(form_id)
+forms = Supersaas::Client.instance.forms.forms(form_id)
 
 if forms.size > 0
   form_id = forms.sample.id
   puts "\n\rgetting form..."
   puts "\n\r#### Supersaas::Client.instance.forms.get(#{form_id})\n\r"
-  form = Supersaas::Client.instance.forms.get(form_id)
+  Supersaas::Client.instance.forms.get(form_id)
 end
+
+puts "\n\rlisting forms from account"
+puts "\n\r#### Supersaas::Client.instance.forms.list\n\r"
+Supersaas::Client.instance.forms.list
 
 puts

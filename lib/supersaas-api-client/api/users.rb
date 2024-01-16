@@ -18,12 +18,12 @@ module Supersaas
       Supersaas::User.new(res)
     end
 
-    def create(attributes, user_id=nil, webhook=nil)
+    def create(attributes, user_id=nil, webhook=nil, duplicate=nil)
       path = user_path(user_id)
       query = {webhook: webhook}
       params = {
         user: {
-          name: validate_present(attributes[:name], :name),
+          name: validate_name(attributes[:name]),
           email: attributes[:email],
           password: attributes[:password],
           full_name: attributes[:full_name],
@@ -31,6 +31,7 @@ module Supersaas
           mobile: attributes[:mobile],
           phone: attributes[:phone],
           country: attributes[:country],
+          timezone: attributes[:timezone],
           field_1: attributes[:field_1],
           field_2: attributes[:field_2],
           super_field: attributes[:super_field],
@@ -38,15 +39,16 @@ module Supersaas
           role: attributes[:role] && validate_options(attributes[:role], User::ROLES)
         }
       }
+      params.merge!(duplicate: validate_duplicate(duplicate)) if duplicate
       client.post(path, params, query)
     end
 
-    def update(user_id, attributes, webhook=nil)
+    def update(user_id, attributes, webhook=nil, notfound=nil)
       path = user_path(validate_id(user_id))
       query = {webhook: webhook}
       params = {
         user: {
-          name: attributes[:name],
+          name: validate_name(attributes[:name]),
           email: attributes[:email],
           password: attributes[:password],
           full_name: attributes[:full_name],
@@ -54,6 +56,7 @@ module Supersaas
           mobile: attributes[:mobile],
           phone: attributes[:phone],
           country: attributes[:country],
+          timezone: attributes[:timezone],
           field_1: attributes[:field_1],
           field_2: attributes[:field_2],
           super_field: attributes[:super_field],
@@ -61,12 +64,19 @@ module Supersaas
           role: attributes[:role] && validate_options(attributes[:role], User::ROLES)
         }
       }
+      params.merge!(notfound: validate_notfound(notfound)) if notfound
       client.put(path, params, query)
     end
 
     def delete(user_id)
       path = user_path(validate_id(user_id))
       client.delete(path)
+    end
+
+    def field_list
+      path = "/field_list"
+      res = client.get(path)
+      res.map { |attributes| Supersaas::FieldList.new(attributes)}
     end
 
     private

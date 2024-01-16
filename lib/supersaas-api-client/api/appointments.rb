@@ -1,12 +1,13 @@
 module Supersaas
   # REF: https://www.supersaas.com/info/dev/appointment_api
   class Appointments < BaseApi
-    def agenda(schedule_id, user_id, from_time=nil)
+    def agenda(schedule_id, user_id, from_time=nil, slot=false)
       path = "/agenda/#{validate_id(schedule_id)}"
       params = {
         user: validate_present(user_id),
         from: from_time && validate_datetime(from_time)
       }
+      params.merge!(slot: true) if slot
       res = client.get(path, params)
       map_slots_or_bookings(res)
     end
@@ -117,17 +118,17 @@ module Supersaas
       client.delete(path, nil, params)
     end
 
-    def changes(schedule_id, from_time=nil, to=nil, slot=false)
+    def changes(schedule_id, from_time=nil, to=nil, slot=false, user=nil, limit=nil, offset=nil)
       path = "/changes/#{validate_id(schedule_id)}"
-      params = build_param({}, from_time, to, slot)
+      params = build_param({}, from_time, to, slot, user, limit, offset)
       res = client.get(path, params)
       map_slots_or_bookings(res)
     end
 
-    def range(schedule_id, today=false, from_time=nil, to=nil, slot=false)
+    def range(schedule_id, today=false, from_time=nil, to=nil, slot=false, user=nil, resource_id=nil, service_id=nil, limit=nil, offset=nil)
       path = "/range/#{validate_id(schedule_id)}"
       params = {}; params.merge!(today: true) if today
-      params = build_param(params, from_time, to, slot)
+      params = build_param(params, from_time, to, slot, user, limit, offset, resource_id, service_id)
       res = client.get(path, params)
       map_slots_or_bookings(res)
     end
@@ -148,10 +149,15 @@ module Supersaas
       end
     end
 
-    def build_param(params, from_time, to, slot)
+    def build_param(params, from_time, to, slot, user, limit, offset, resource_id=nil, service_id=nil)
       params.merge!(from: validate_datetime(from_time)) if from_time
       params.merge!(to: validate_datetime(to)) if to
       params.merge!(slot: true) if slot
+      params.merge!(user: validate_user(user)) if user
+      params.merge!(limit: validate_number(limit)) if limit
+      params.merge!(offset: validate_number(offset)) if offset
+      params.merge!(user: validate_id(resource_id)) if resource_id
+      params.merge!(user: validate_id(service_id)) if service_id
       params
     end
   end
