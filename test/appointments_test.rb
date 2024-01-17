@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 module Supersaas
@@ -7,8 +9,8 @@ module Supersaas
       @client.account_name = 'accnt'
       @client.api_key = 'xxxxxxxxxxxxxxxxxxxxxx'
       @client.dry_run = true
-      @schedule_id = 12345
-      @appointment_id = 67890
+      @schedule_id = 12_345
+      @appointment_id = 67_890
       @user_id = 9876
     end
 
@@ -22,12 +24,12 @@ module Supersaas
       limit = 10
       form = true
       refute_nil @client.appointments.list(@schedule_id, form, start_time, limit)
-      assert_last_request_path "/api/bookings.json?schedule_id=#{@schedule_id}&form=true&#{URI.encode_www_form(start: start_time.strftime("%Y-%m-%d %H:%M:%S"))}&limit=#{limit}"
+      assert_last_request_path "/api/bookings.json?schedule_id=#{@schedule_id}&form=true&#{URI.encode_www_form(start: start_time.strftime('%Y-%m-%d %H:%M:%S'))}&limit=#{limit}"
     end
 
     def test_create
       refute_nil @client.appointments.create(@schedule_id, @user_id, appointment_attributes, true, true)
-      assert_last_request_path "/api/bookings.json"
+      assert_last_request_path '/api/bookings.json'
     end
 
     def test_update
@@ -48,25 +50,26 @@ module Supersaas
     def test_available
       from_time = Time.now
       refute_nil @client.appointments.available(@schedule_id, from_time)
-      assert_last_request_path "/api/free/#{@schedule_id}.json?#{URI.encode_www_form(from: from_time.strftime("%Y-%m-%d %H:%M:%S"))}"
+      assert_last_request_path "/api/free/#{@schedule_id}.json?#{URI.encode_www_form(from: from_time.strftime('%Y-%m-%d %H:%M:%S'))}"
     end
 
     def test_available_full
       length_minutes = 15
       resource = 'MyResource'
       limit = 10
-      refute_nil @client.appointments.available(@schedule_id, "2017-01-31 14:30:00", length_minutes, resource, true, limit)
-      assert_last_request_path "/api/free/#{@schedule_id}.json?length=#{length_minutes}&#{URI.encode_www_form(from: "2017-01-31 14:30:00")}&resource=#{resource}&full=true&maxresults=#{limit}"
+      refute_nil @client.appointments.available(@schedule_id, '2017-01-31 14:30:00', length_minutes, resource, true,
+                                                limit)
+      assert_last_request_path "/api/free/#{@schedule_id}.json?length=#{length_minutes}&#{URI.encode_www_form(from: '2017-01-31 14:30:00')}&resource=#{resource}&full=true&maxresults=#{limit}"
     end
 
     def test_changes
-      from = "2017-01-31 14:30:00"
+      from = '2017-01-31 14:30:00'
       refute_nil @client.appointments.changes(@schedule_id, from)
       assert_last_request_path "/api/changes/#{@schedule_id}.json?#{URI.encode_www_form(from: from)}"
     end
 
     def test_range
-      from = "2017-01-31 14:30:00"
+      from = '2017-01-31 14:30:00'
       refute_nil @client.appointments.range(@schedule_id, false, from)
       assert_last_request_path "/api/range/#{@schedule_id}.json?#{URI.encode_www_form(from: from)}"
     end

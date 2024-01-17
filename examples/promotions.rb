@@ -1,4 +1,6 @@
-require "supersaas-api-client"
+# frozen_string_literal: true
+
+require 'supersaas-api-client'
 
 puts "\n\r# SuperSaaS Promotions Example\n\r"
 
@@ -23,8 +25,8 @@ promotions = Supersaas::Client.instance.promotions.list
   Supersaas::Client.instance.promotions.promotion(promotions[i].code)
 end
 
-# Uncomment to try out duplicating a promotional code
-# puts "\n\rduplicate promotional code"
-# puts "\n\r#### Supersaas::Client.instance.promotions.duplicate_promotion_code('new_id', 'promotion_id_to_duplicate')\n\r"
-# Supersaas::Client.instance.promotions.duplicate_promotion_code("pcode" + SecureRandom.hex(4), promotions.first.code)
-# puts
+Uncomment to try out duplicating a promotional code
+puts "\n\rduplicate promotional code"
+puts "\n\r#### Supersaas::Client.instance.promotions.duplicate_promotion_code('new_id', 'id_to_duplicate')\n\r"
+Supersaas::Client.instance.promotions.duplicate_promotion_code("pcode#{SecureRandom.hex(4)}", promotions.first.code)
+puts

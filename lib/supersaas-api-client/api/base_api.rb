@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module Supersaas
   class BaseApi
     attr_accessor :client
 
-    INTEGER_REGEX = /\A[0-9]+\Z/
-    DATETIME_REGEX = /\A\d{4}-\d{1,2}-\d{1,2}\s\d{1,2}:\d{1,2}:\d{1,2}\Z/
-    PROMOTION_REGEX = /\A[0-9a-zA-Z]+\Z/
+    INTEGER_REGEX = /\A[0-9]+\Z/.freeze
+    DATETIME_REGEX = /\A\d{4}-\d{1,2}-\d{1,2}\s\d{1,2}:\d{1,2}:\d{1,2}\Z/.freeze
+    PROMOTION_REGEX = /\A[0-9a-zA-Z]+\Z/.freeze
 
     def initialize(client)
       @client = client
@@ -18,71 +20,72 @@ module Supersaas
       elsif value.is_a?(String) && value =~ INTEGER_REGEX
         value.to_i
       else
-        raise Supersaas::Exception.new("Invalid id parameter: #{value}. Provide a integer value.")
+        raise Supersaas::Exception, "Invalid id parameter: #{value}. Provide a integer value."
       end
     end
-    def validate_number(value); validate_id(value); end
+
+    def validate_number(value)
+      validate_id(value)
+    end
 
     def validate_name(value)
-      if value.nil? || value.is_a?(String) && value.size
-        value
-      else
-        raise Supersaas::Exception.new("Required parameter name is missing.")
+      unless value.nil? || value.is_a?(String) && value.size
+        raise Supersaas::Exception, 'Required parameter name is missing.'
       end
+
+      value
     end
 
     def validate_present(value)
-      if value
-        value
-      else
-        raise Supersaas::Exception.new("Required parameter is missing.")
-      end
+      raise Supersaas::Exception, 'Required parameter is missing.' unless value
+
+      value
     end
 
     def validate_notfound(value)
-      if value.is_a?(String) && (value == 'error' || value == 'ignore')
-        value
-      else
-        raise Supersaas::Exception.new("Required parameter notfound can only be 'error' or 'ignore'.")
+      unless value.is_a?(String) && %w[error ignore].include?(value)
+        raise Supersaas::Exception, "Required parameter notfound can only be 'error' or 'ignore'."
       end
+
+      value
     end
 
     def validate_promotion(value)
-      if value.is_a?(String) && value.size && value =~ PROMOTION_REGEX
-        value
-      else
-        raise Supersaas::Exception.new("Required parameter promotional code not found or contains other than alphanumeric characters.")
+      unless value.is_a?(String) && value.size && value =~ PROMOTION_REGEX
+        raise Supersaas::Exception,
+              'Required parameter promotional code not found or contains other than alphanumeric characters.'
       end
+
+      value
     end
 
     def validate_duplicate(value)
-      if value.is_a?(String) && value == 'raise'
-        value
-      else
-        raise Supersaas::Exception.new("Required parameter duplicate can only be 'raise'.")
+      unless value.is_a?(String) && value == 'raise'
+        raise Supersaas::Exception, "Required parameter duplicate can only be 'raise'."
       end
+
+      value
     end
 
     def validate_datetime(value)
-      begin
-        if value.is_a?(String) && value =~ DATETIME_REGEX
-          value
-        elsif value.is_a?(Time) || value.is_a?(DateTime)
-          value.strftime("%Y-%m-%d %H:%M:%S")
-        else
-          raise ArgumentError
-        end
-      rescue ArgumentError
-        raise Supersaas::Exception.new("Invalid datetime parameter: #{value}. Provide a Time object or formatted 'YYYY-DD-MM HH:MM:SS' string.")
+      if value.is_a?(String) && value =~ DATETIME_REGEX
+        value
+      elsif value.is_a?(Time) || value.is_a?(DateTime)
+        value.strftime('%Y-%m-%d %H:%M:%S')
+      else
+        raise ArgumentError
       end
+    rescue ArgumentError
+      raise Supersaas::Exception,
+            "Invalid datetime parameter: #{value}. Provide a Time object or formatted 'YYYY-DD-MM HH:MM:SS' string."
     end
 
     def validate_options(value, options)
-      if options.include?(value)
-        value
-      else
-        raise Supersaas::Exception.new("Invalid option parameter: #{value}. Must be one of #{options.join(', ')}.")
+      unless options.include?(value)
+        raise Supersaas::Exception, "Invalid option parameter: #{value}. Must be one of #{options.join(', ')}."
       end
+
+      value
     end
   end
 end

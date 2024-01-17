@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Supersaas
   class BaseModel
     attr_accessor :errors

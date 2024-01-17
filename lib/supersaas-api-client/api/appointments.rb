@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module Supersaas
   # REF: https://www.supersaas.com/info/dev/appointment_api
   class Appointments < BaseApi
-    def agenda(schedule_id, user_id, from_time=nil, slot=false)
+    def agenda(schedule_id, user_id, from_time = nil, slot = false)
       path = "/agenda/#{validate_id(schedule_id)}"
       params = {
         user: validate_present(user_id),
@@ -12,7 +14,7 @@ module Supersaas
       map_slots_or_bookings(res)
     end
 
-    def agenda_slots(schedule_id, user_id, from_time=nil)
+    def agenda_slots(schedule_id, user_id, from_time = nil)
       path = "/agenda/#{validate_id(schedule_id)}"
       params = {
         user: validate_present(user_id),
@@ -23,7 +25,7 @@ module Supersaas
       map_slots_or_bookings(res, true)
     end
 
-    def available(schedule_id, from_time, length_minutes=nil, resource=nil, full=nil, limit=nil)
+    def available(schedule_id, from_time, length_minutes = nil, resource = nil, full = nil, limit = nil)
       path = "/free/#{validate_id(schedule_id)}"
       params = {
         length: length_minutes && validate_number(length_minutes),
@@ -36,27 +38,27 @@ module Supersaas
       map_slots_or_bookings(res)
     end
 
-    def list(schedule_id, form=nil, start_time=nil, limit=nil)
-      path = "/bookings"
+    def list(schedule_id, form = nil, start_time = nil, limit = nil)
+      path = '/bookings'
       params = {
-          schedule_id: validate_id(schedule_id),
-          form: form ? true : nil,
-          start: start_time ? validate_datetime(start_time) : nil,
-          limit: limit && validate_number(limit)
+        schedule_id: validate_id(schedule_id),
+        form: form ? true : nil,
+        start: start_time ? validate_datetime(start_time) : nil,
+        limit: limit && validate_number(limit)
       }
       res = client.get(path, params)
       map_slots_or_bookings(res)
     end
 
     def get(schedule_id, appointment_id)
-      params = {schedule_id: validate_id(schedule_id)}
+      params = { schedule_id: validate_id(schedule_id) }
       path = "/bookings/#{validate_id(appointment_id)}"
       res = client.get(path, params)
       Supersaas::Appointment.new(res)
     end
 
-    def create(schedule_id, user_id, attributes, form=nil, webhook=nil)
-      path = "/bookings"
+    def create(schedule_id, user_id, attributes, form = nil, webhook = nil)
+      path = '/bookings'
       params = {
         schedule_id: schedule_id,
         webhook: webhook,
@@ -84,7 +86,7 @@ module Supersaas
       client.post(path, params)
     end
 
-    def update(schedule_id, appointment_id, attributes, form=nil, webhook=nil)
+    def update(schedule_id, appointment_id, attributes, form = nil, webhook = nil)
       path = "/bookings/#{validate_id(appointment_id)}"
       params = {
         schedule_id: schedule_id,
@@ -114,20 +116,22 @@ module Supersaas
 
     def delete(schedule_id, appointment_id)
       path = "/bookings/#{validate_id(appointment_id)}"
-      params = {schedule_id: validate_id(schedule_id)}
+      params = { schedule_id: validate_id(schedule_id) }
       client.delete(path, nil, params)
     end
 
-    def changes(schedule_id, from_time=nil, to=nil, slot=false, user=nil, limit=nil, offset=nil)
+    def changes(schedule_id, from_time = nil, to = nil, slot = false, user = nil, limit = nil, offset = nil)
       path = "/changes/#{validate_id(schedule_id)}"
       params = build_param({}, from_time, to, slot, user, limit, offset)
       res = client.get(path, params)
       map_slots_or_bookings(res)
     end
 
-    def range(schedule_id, today=false, from_time=nil, to=nil, slot=false, user=nil, resource_id=nil, service_id=nil, limit=nil, offset=nil)
+    def range(schedule_id, today = false, from_time = nil, to = nil, slot = false, user = nil, resource_id = nil, service_id = nil,
+              limit = nil, offset = nil)
       path = "/range/#{validate_id(schedule_id)}"
-      params = {}; params.merge!(today: true) if today
+      params = {}
+      params.merge!(today: true) if today
       params = build_param(params, from_time, to, slot, user, limit, offset, resource_id, service_id)
       res = client.get(path, params)
       map_slots_or_bookings(res)
@@ -135,7 +139,7 @@ module Supersaas
 
     private
 
-    def map_slots_or_bookings(obj, slot=false)
+    def map_slots_or_bookings(obj, slot = false)
       if obj.is_a?(Array) && slot
         obj.map { |attributes| Supersaas::Slot.new(attributes) }
       elsif obj.is_a?(Array)
@@ -149,7 +153,7 @@ module Supersaas
       end
     end
 
-    def build_param(params, from_time, to, slot, user, limit, offset, resource_id=nil, service_id=nil)
+    def build_param(params, from_time, to, slot, user, limit, offset, resource_id = nil, service_id = nil)
       params.merge!(from: validate_datetime(from_time)) if from_time
       params.merge!(to: validate_datetime(to)) if to
       params.merge!(slot: true) if slot

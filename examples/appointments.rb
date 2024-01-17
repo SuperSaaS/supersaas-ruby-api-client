@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
-require "date"
-require "pp"
-require "supersaas-api-client"
+require 'date'
+require 'supersaas-api-client'
 
 puts "\n\r# SuperSaaS Appointments Example\n\r"
 
@@ -31,11 +31,12 @@ new_appointment_id = nil
 user = ENV['SSS_API_USER']
 if user
   description = '1234567890.'
-  params = {full_name: 'Example', description: description, name: 'example@example.com', email: 'example@example.com', mobile: '555-5555', phone: '555-5555', address: 'addr'}
+  params = { full_name: 'Example', description: description, name: 'example@example.com', email: 'example@example.com',
+             mobile: '555-5555', phone: '555-5555', address: 'addr' }
   if show_slot
     params[:slot_id] = ENV['SSS_API_SLOT']
   else
-    days = 1 + rand(30)
+    days = rand(1..30)
     params[:start] = Time.now + (days * 24 * 60 * 60)
     params[:finish] = params[:start] + (60 * 60)
   end
@@ -52,19 +53,19 @@ puts "\n\r#### Supersaas::Client.instance.appointments.list(#{schedule_id}, nil,
 appointments = Supersaas::Client.instance.appointments.list(schedule_id, nil, nil, 25)
 appointments.each do |appointment|
   puts "#{description} == #{appointment.description}"
-  if description == appointment.description
-    puts "\n\rupdating appointment..."
-    puts "\n\r#### Supersaas::Client.instance.appointments.update(#{schedule_id}, #{new_appointment_id}, {...})\n\r"
-    Supersaas::Client.instance.appointments.update(schedule_id, new_appointment_id, {country: 'FR', address: 'Rue 1'})
+  next unless description == appointment.description
 
-    puts "\n\rdeleting appointment..."
-    puts "\n\r#### Supersaas::Client.instance.appointments.delete(#{schedule_id}. #{new_appointment_id})\n\r"
-    Supersaas::Client.instance.appointments.delete(schedule_id, new_appointment_id)
-    break
-  end
+  puts "\n\rupdating appointment..."
+  puts "\n\r#### Supersaas::Client.instance.appointments.update(#{schedule_id}, #{new_appointment_id}, {...})\n\r"
+  Supersaas::Client.instance.appointments.update(schedule_id, new_appointment_id, { country: 'FR', address: 'Rue 1' })
+
+  puts "\n\rdeleting appointment..."
+  puts "\n\r#### Supersaas::Client.instance.appointments.delete(#{schedule_id}. #{new_appointment_id})\n\r"
+  Supersaas::Client.instance.appointments.delete(schedule_id, new_appointment_id)
+  break
 end
 
-if appointments.size > 0
+if appointments.size.positive?
   appointment_id = appointments.sample.id
   puts "\n\rgetting appointment..."
   puts "\n\r#### Supersaas::Client.instance.appointments.get(#{appointment_id})\n\r"
@@ -73,19 +74,22 @@ end
 
 puts "\n\rlisting changes..."
 from = DateTime.now - 120
-to = DateTime.now + 360000
-puts "\n\r#### Supersaas::Client.instance.appointments.changes(#{schedule_id}, '#{from.strftime("%Y-%m-%d %H:%M:%S")}', '#{to.strftime("%Y-%m-%d %H:%M:%S")}',  #{show_slot || 'false'})\n\r"
+to = DateTime.now + 360_000
+puts "\n\r#### Supersaas::Client.instance.appointments.changes(#{schedule_id},
+  '#{from.strftime('%Y-%m-%d %H:%M:%S')}', '#{to.strftime('%Y-%m-%d %H:%M:%S')}', #{show_slot || 'false'})\n\r"
 
 Supersaas::Client.instance.appointments.changes(schedule_id, from, show_slot)
 
 puts "\n\rlisting available..."
 from = DateTime.now
-puts "\n\r#### Supersaas::Client.instance.appointments.available(#{schedule_id}, '#{from.strftime("%Y-%m-%d %H:%M:%S")}')\n\r"
+puts "\n\r#### Supersaas::Client.instance.appointments.available(#{schedule_id},
+  '#{from.strftime('%Y-%m-%d %H:%M:%S')}')\n\r"
 
 Supersaas::Client.instance.appointments.available(schedule_id, from)
 
 puts "\n\rAppointments for a single user..."
 user = Supersaas::Client.instance.users.list(nil, 1).first
 from = DateTime.now
-puts "\n\r#### Supersaas::Client.instance.appointments.agenda(#{schedule_id}, user.id, '#{from.strftime("%Y-%m-%d %H:%M:%S")}')\n\r"
-Supersaas::Client.instance.appointments.agenda(schedule_id, user.id, from.strftime("%Y-%m-%d %H:%M:%S"))
+puts "\n\r#### Supersaas::Client.instance.appointments.agenda(#{schedule_id}, user.id,
+  '#{from.strftime('%Y-%m-%d %H:%M:%S')}')\n\r"
+Supersaas::Client.instance.appointments.agenda(schedule_id, user.id, from.strftime('%Y-%m-%d %H:%M:%S'))

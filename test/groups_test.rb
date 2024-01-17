@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 module Supersaas
@@ -8,7 +10,7 @@ module Supersaas
 
     def test_list
       refute_nil @client.groups.list
-      assert_last_request_path "/api/groups.json"
+      assert_last_request_path '/api/groups.json'
     end
   end
 end

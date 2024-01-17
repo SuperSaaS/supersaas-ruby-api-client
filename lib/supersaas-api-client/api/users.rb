@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 module Supersaas
   # REF: https://www.supersaas.com/info/dev/user_api
   class Users < BaseApi
-    def list(form=nil, limit=nil, offset=nil)
+    def list(form = nil, limit = nil, offset = nil)
       path = user_path(nil)
       params = {
-          form: form ? true : nil,
-          limit: limit && validate_number(limit),
-          offset: offset && validate_number(offset)
+        form: form ? true : nil,
+        limit: limit && validate_number(limit),
+        offset: offset && validate_number(offset)
       }
       res = client.get(path, params)
       res.map { |attributes| Supersaas::User.new(attributes) }
@@ -18,9 +20,9 @@ module Supersaas
       Supersaas::User.new(res)
     end
 
-    def create(attributes, user_id=nil, webhook=nil, duplicate=nil)
+    def create(attributes, user_id = nil, webhook = nil, duplicate = nil)
       path = user_path(user_id)
-      query = {webhook: webhook}
+      query = { webhook: webhook }
       params = {
         user: {
           name: validate_name(attributes[:name]),
@@ -43,9 +45,9 @@ module Supersaas
       client.post(path, params, query)
     end
 
-    def update(user_id, attributes, webhook=nil, notfound=nil)
+    def update(user_id, attributes, webhook = nil, notfound = nil)
       path = user_path(validate_id(user_id))
-      query = {webhook: webhook}
+      query = { webhook: webhook }
       params = {
         user: {
           name: validate_name(attributes[:name]),
@@ -74,16 +76,16 @@ module Supersaas
     end
 
     def field_list
-      path = "/field_list"
+      path = '/field_list'
       res = client.get(path)
-      res.map { |attributes| Supersaas::FieldList.new(attributes)}
+      res.map { |attributes| Supersaas::FieldList.new(attributes) }
     end
 
     private
 
     def user_path(user_id)
       if user_id.nil? || user_id == ''
-        "/users"
+        '/users'
       else
         "/users/#{user_id}"
       end

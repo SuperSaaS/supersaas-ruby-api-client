@@ -1,8 +1,10 @@
-$:.push File.expand_path('../../lib', __FILE__)
+# frozen_string_literal: true
 
-require "supersaas-api-client"
+$LOAD_PATH.push File.expand_path('../lib', __dir__)
 
-require "minitest/autorun"
+require 'supersaas-api-client'
+
+require 'minitest/autorun'
 
 class SupersaasTest < Minitest::Test
   def assert_last_request_path(path)
@@ -12,7 +14,7 @@ class SupersaasTest < Minitest::Test
   protected
 
   def client_instance
-    if !defined? @client
+    unless defined? @client
       @client = Supersaas::Client.instance
       @client.account_name = 'accnt'
       @client.api_key = 'xxxxxxxxxxxxxxxxxxxxxx'

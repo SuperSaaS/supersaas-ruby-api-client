@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
-require "supersaas-api-client"
+require 'supersaas-api-client'
 
-puts "\n\r# SuperSaaS Information Example\n\r"
+puts "\n\r# SuperSaaS Schedules Example\n\r"
 
 unless Supersaas::Client.instance.account_name && Supersaas::Client.instance.api_key
   puts "ERROR! Missing account credentials. Rerun the script with your credentials, e.g.\n\r"

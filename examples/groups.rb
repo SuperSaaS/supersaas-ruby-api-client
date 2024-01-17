@@ -1,4 +1,6 @@
-require "supersaas-api-client"
+# frozen_string_literal: true
+
+require 'supersaas-api-client'
 
 puts "\n\r# SuperSaaS Groups Example\n\r"
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 module Supersaas
@@ -18,7 +20,7 @@ module Supersaas
     def test_request_methods
       @client.account_name = 'Test'
       @client.api_key = 'testing123'
-      [:get,:put,:post,:delete].each do |method|
+      %i[get put post delete].each do |method|
         refute_nil @client.send(method, '/test')
         assert_equal method.to_s.upcase, @client.last_request.method
         assert_equal '/api/test.json', @client.last_request.path

@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
-require "pp"
-require "supersaas-api-client"
+require 'supersaas-api-client'
 
 puts "\n\r# SuperSaaS Forms Example\n\r"
 
@@ -29,7 +29,7 @@ puts "\n\r#### Supersaas::Client.instance.forms.forms(#{form_id})\n\r"
 
 forms = Supersaas::Client.instance.forms.forms(form_id)
 
-if forms.size > 0
+if forms.size.positive?
   form_id = forms.sample.id
   puts "\n\rgetting form..."
   puts "\n\r#### Supersaas::Client.instance.forms.get(#{form_id})\n\r"
