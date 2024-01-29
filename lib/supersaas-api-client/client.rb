@@ -77,18 +77,18 @@ module Supersaas
 
     private
 
-    WINDOW_SIZE = 1
-    # The rate limiter allows a maximum of 4 requests within the specified time window defined by the WINDOW_SIZE.
+    # The rate limiter allows a maximum of 4 requests within the specified time window
+    WINDOW_SIZE = 1 # seconds
     MAX_PER_WINDOW = 4
     def throttle
       # A queue to store timestamps of requests made within the rate limiting window
-      @q ||= Array.new(MAX_PER_WINDOW)
+      @queue ||= Array.new(MAX_PER_WINDOW)
       # Represents the timestamp of the oldest request within the time window
-      oldest_request = @q.push(Time.now).shift
+      oldest_request = @queue.push(Time.now).shift
       # This ensures that the client does not make requests faster than the defined rate limit
-      return unless oldest_request && (d = Time.now - oldest_request) < WINDOW_SIZE
-
-      sleep WINDOW_SIZE - d
+      if oldest_request && (d = Time.now - oldest_request) < WINDOW_SIZE
+        sleep WINDOW_SIZE - d
+      end
     end
 
     def request(http_method, path, params = {}, query = {})
@@ -146,7 +146,7 @@ module Supersaas
       begin
         res = http.request(req)
       rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
-             Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
+        Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
         raise Supersaas::Exception, "HTTP Request Error (#{uri}#{path}): #{e.message}"
       end
 
@@ -182,11 +182,11 @@ module Supersaas
       when 404
         raise Supersaas::Exception, 'HTTP Request Error: Not Found'
       when 501
-        raise Supersaas::Exception, 'Not yet implemented for service schedule'
+        raise Supersaas::Exception, 'Not yet implemented for service type schedule'
       when 403
         raise Supersaas::Exception, 'Unauthorized'
       when 405
-        raise Supersaas::Exception, 'Not available for Capacity type'
+        raise Supersaas::Exception, 'Not available for capacity type schedule'
       else
         raise Supersaas::Exception, "HTTP Request Error: #{code}"
       end

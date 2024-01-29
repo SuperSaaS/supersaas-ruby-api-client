@@ -2,6 +2,7 @@
 
 module Supersaas
   class Promotions < BaseApi
+    # REF: https://www.supersaas.com/info/dev/promotion_api
     def list(limit = nil, offset = nil)
       path = '/promotions'
       params = {

@@ -9,19 +9,11 @@ module Supersaas
     attr_reader :form, :slot
 
     def form=(value)
-      @form = if value.is_a?(Hash)
-                Supersaas::Form.new(value)
-              else
-                value
-              end
+      @form = value.is_a?(Hash) ? Supersaas::Form.new(value) : value
     end
 
     def slot=(value)
-      @slot = if value.is_a?(Hash)
-                Supersaas::Slot.new(value)
-              else
-                value
-              end
+      @slot = value.is_a?(Hash) ? Supersaas::Slot.new(value) : value
     end
   end
 end

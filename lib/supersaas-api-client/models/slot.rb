@@ -6,11 +6,7 @@ module Supersaas
     attr_reader :bookings
 
     def bookings=(value)
-      @bookings = if value.is_a?(Array)
-                    value.map { |attributes| Supersaas::Appointment.new(attributes) }
-                  else
-                    value
-                  end
+      @bookings = value.is_a?(Array) ? value.map { |attributes| Supersaas::Appointment.new(attributes) } : value
     end
   end
 end

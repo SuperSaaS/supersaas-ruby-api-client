@@ -7,17 +7,15 @@ require 'supersaas-api-client/version'
 Gem::Specification.new do |spec|
   spec.name          = 'supersaas-api-client'
   spec.version       = Supersaas::VERSION
-  spec.authors       = ['Travis Dunn']
-  spec.email         = ['travis@supersaas.com']
+  spec.authors       = ['Kaarle Kulvik']
+  spec.email         = ['kaarle@supersaas.com']
 
-  spec.summary       = 'Online bookings/appointments/calendars using the SuperSaaS scheduling platform.'
-  spec.description   = 'Online appointment scheduler for any type of business. Flexible and affordable booking software that can be integrated into any site. Free basic version.'
+  spec.summary       = 'Manage appointments and users on the SuperSaaS scheduling platform'
+  spec.description   = 'Online appointment scheduling for any type of business. Flexible and affordable booking software that can be integrated into any site. Free basic version.'
   spec.homepage      = 'https://www.supersaas.com'
   spec.license       = 'MIT'
 
-  spec.files         = `git ls-files -z`.split("\x0").reject do |f|
-    f.match(%r{^(test)/})
-  end
+  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^test/}) }
   spec.bindir        = 'bin'
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']

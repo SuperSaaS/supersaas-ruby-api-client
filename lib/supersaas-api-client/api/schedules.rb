@@ -2,6 +2,7 @@
 
 module Supersaas
   class Schedules < BaseApi
+    # REF: https://www.supersaas.com/info/dev/information_api
     def list
       path = '/schedules'
       res = client.get(path)

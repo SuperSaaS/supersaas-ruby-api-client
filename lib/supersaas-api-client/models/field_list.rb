@@ -6,11 +6,7 @@ module Supersaas
     attr_reader :spec
 
     def spec=(value)
-      @spec = if value.is_a?(Array)
-                value.map { |attributes| JSON.parse(attributes) }
-              else
-                value
-              end
+      @spec = value.is_a?(Array) ? value.map { |attributes| JSON.parse(attributes) } : value
     end
   end
 end

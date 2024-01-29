@@ -7,11 +7,7 @@ module Supersaas
     attr_reader :form
 
     def form=(value)
-      @form = if value.is_a?(Hash)
-                Supersaas::Form.new(value)
-              else
-                value
-              end
+      @form = value.is_a?(Hash) ? Supersaas::Form.new(value) : value
     end
   end
 end
