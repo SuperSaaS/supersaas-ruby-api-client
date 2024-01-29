@@ -22,7 +22,7 @@ module Supersaas
     def duplicate_promotion_code(promotion_code, template_code)
       path = '/promotions'
       query = { id: validate_promotion(promotion_code), template_code: validate_promotion(template_code) }
-      client.get(path, query)
+      client.post(path, query)
     end
   end
 end

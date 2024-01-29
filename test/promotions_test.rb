@@ -21,7 +21,7 @@ module Supersaas
 
     def test_duplicate_promotion_code
       refute_nil @client.promotions.duplicate_promotion_code('new123', @promotion_code)
-      assert_last_request_path '/api/promotions.json?id=new123&template_code=abc123'
+      assert_last_request_path '/api/promotions.json'
     end
   end
 end

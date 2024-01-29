@@ -28,13 +28,13 @@ end
 
 description = nil
 new_appointment_id = nil
-user = ENV['SSS_API_USER']
+user = ENV.fetch('SSS_API_USER', nil)
 if user
   description = '1234567890.'
   params = { full_name: 'Example', description: description, name: 'example@example.com', email: 'example@example.com',
              mobile: '555-5555', phone: '555-5555', address: 'addr' }
   if show_slot
-    params[:slot_id] = ENV['SSS_API_SLOT']
+    params[:slot_id] = ENV.fetch('SSS_API_SLOT', nil)
   else
     days = rand(1..30)
     params[:start] = Time.now + (days * 24 * 60 * 60)

@@ -24,12 +24,22 @@ module Supersaas
       end
     end
 
+    def validate_user(value)
+      return if value.nil?
+
+      unless value.is_a?(Integer) || value.is_a?(String)
+        raise Supersaas::Exception, "Invalid user id parameter: #{value}."
+      end
+
+      value
+    end
+
     def validate_number(value)
       validate_id(value)
     end
 
     def validate_name(value)
-      unless value.nil? || value.is_a?(String) && value.size
+      unless value.nil? || (value.is_a?(String) && value.size)
         raise Supersaas::Exception, 'Required parameter name is missing.'
       end
 
@@ -60,8 +70,8 @@ module Supersaas
     end
 
     def validate_duplicate(value)
-      unless value.is_a?(String) && value == 'raise'
-        raise Supersaas::Exception, "Required parameter duplicate can only be 'raise'."
+      unless value.is_a?(String) && %w[ignore raise].include?(value)
+        raise Supersaas::Exception, "Required parameter duplicate can only be 'ignore'."
       end
 
       value

@@ -90,8 +90,6 @@ module Supersaas
       path = "/bookings/#{validate_id(appointment_id)}"
       params = {
         schedule_id: schedule_id,
-        webhook: webhook,
-        form: form,
         booking: {
           start: attributes[:start],
           finish: attributes[:finish],
@@ -111,6 +109,10 @@ module Supersaas
           slot_id: attributes[:slot_id]
         }
       }
+
+      params.merge!(form: form) if form
+      params.merge!(webhook: webhook) if webhook
+      params[:booking].compact!
       client.put(path, params)
     end
 
@@ -160,8 +162,8 @@ module Supersaas
       params.merge!(user: validate_user(user)) if user
       params.merge!(limit: validate_number(limit)) if limit
       params.merge!(offset: validate_number(offset)) if offset
-      params.merge!(user: validate_id(resource_id)) if resource_id
-      params.merge!(user: validate_id(service_id)) if service_id
+      params.merge!(resource_id: validate_id(resource_id)) if resource_id
+      params.merge!(service_id: validate_id(service_id)) if service_id
       params
     end
   end

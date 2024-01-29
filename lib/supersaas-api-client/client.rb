@@ -78,7 +78,7 @@ module Supersaas
     private
 
     WINDOW_SIZE = 1
-    # The rate limiter allows a maximum of 4 requests within the specified time window defined by the WINDOW_SIZE
+    # The rate limiter allows a maximum of 4 requests within the specified time window defined by the WINDOW_SIZE.
     MAX_PER_WINDOW = 4
     def throttle
       # A queue to store timestamps of requests made within the rate limiting window
@@ -165,14 +165,39 @@ module Supersaas
         else
           json_body(res)
         end
-      when 422, 400
-        json_body(res)
+      else
+        handle_errors(code, res)
+      end
+    end
+
+    def handle_errors(code, res)
+      print_errors(res)
+      case code
+      when 422
+        raise Supersaas::Exception, 'HTTP Request Error: Unprocessable Content'
+      when 400
+        raise Supersaas::Exception, 'HTTP Request Error: Bad Request'
       when 401
         raise Supersaas::Exception, 'HTTP Request Error: Unauthorised'
       when 404
         raise Supersaas::Exception, 'HTTP Request Error: Not Found'
-      else # everything else exception !?
-        {}
+      when 501
+        raise Supersaas::Exception, 'Not yet implemented for service schedule'
+      when 403
+        raise Supersaas::Exception, 'Unauthorized'
+      when 405
+        raise Supersaas::Exception, 'Not available for Capacity type'
+      else
+        raise Supersaas::Exception, "HTTP Request Error: #{code}"
+      end
+    end
+
+    def print_errors(res)
+      json_body = json_body(res)
+      return unless json_body[:errors]
+
+      errors each do |error|
+        puts "Error code: #{error['code']}, #{error['title']}"
       end
     end
 
@@ -186,7 +211,7 @@ module Supersaas
       return hash unless hash
 
       hash.delete_if do |_k, v|
-        v = v.delete_if { |_k2, v2| v2.nil? } if v.is_a?(Hash)
+        v = v.compact if v.is_a?(Hash)
         v.nil? || v == ''
       end
     end
@@ -197,8 +222,8 @@ module Supersaas
       attr_accessor :account_name, :host, :api_key, :dry_run, :verbose
 
       def initialize
-        @account_name = ENV['SSS_API_ACCOUNT_NAME']
-        @api_key = ENV['SSS_API_KEY']
+        @account_name = ENV.fetch('SSS_API_ACCOUNT_NAME', nil)
+        @api_key = ENV.fetch('SSS_API_KEY', nil)
         @host = DEFAULT_HOST
         @dry_run = false
         @verbose = false

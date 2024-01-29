@@ -23,6 +23,7 @@ module Supersaas
     def create(attributes, user_id = nil, webhook = nil, duplicate = nil)
       path = user_path(user_id)
       query = { webhook: webhook }
+      query.merge!(duplicate: validate_duplicate(duplicate)) if duplicate
       params = {
         user: {
           name: validate_name(attributes[:name]),
@@ -41,13 +42,13 @@ module Supersaas
           role: attributes[:role] && validate_options(attributes[:role], User::ROLES)
         }
       }
-      params.merge!(duplicate: validate_duplicate(duplicate)) if duplicate
       client.post(path, params, query)
     end
 
     def update(user_id, attributes, webhook = nil, notfound = nil)
-      path = user_path(validate_id(user_id))
+      path = user_path(user_id)
       query = { webhook: webhook }
+      query.merge!(notfound: validate_notfound(notfound)) if notfound
       params = {
         user: {
           name: validate_name(attributes[:name]),
@@ -66,12 +67,12 @@ module Supersaas
           role: attributes[:role] && validate_options(attributes[:role], User::ROLES)
         }
       }
-      params.merge!(notfound: validate_notfound(notfound)) if notfound
+      params[:user].compact!
       client.put(path, params, query)
     end
 
     def delete(user_id)
-      path = user_path(validate_id(user_id))
+      path = user_path(user_id)
       client.delete(path)
     end
 
@@ -87,7 +88,7 @@ module Supersaas
       if user_id.nil? || user_id == ''
         '/users'
       else
-        "/users/#{user_id}"
+        "/users/#{validate_user(user_id)}"
       end
     end
   end

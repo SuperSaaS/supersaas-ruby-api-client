@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    supersaas-api-client (1.1.1)
+    supersaas-api-client (2.0.0)
 
 GEM
   remote: https://rubygems.org/

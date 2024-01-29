@@ -5,11 +5,9 @@ module Supersaas
   class Forms < BaseApi
     def list(template_form_id, from_time = nil, user = nil)
       path = '/forms'
-      params = {
-        form_id: validate_id(template_form_id),
-        from: from_time ? validate_datetime(from_time) : nil,
-        user: user ? validate_user(user) : nil
-      }
+      params = { form_id: validate_id(template_form_id) }
+      params.merge!(from: validate_datetime(from_time)) if from_time
+      params.merge!(user: validate_user(user)) if user
       res = client.get(path, params)
       res.map { |attributes| Supersaas::Form.new(attributes) }
     end
