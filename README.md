@@ -1,33 +1,29 @@
 # SuperSaaS Ruby API Client
 
-Online bookings/appointments/calendars in Ruby using the SuperSaaS scheduling platform - https://supersaas.com
+Manage appointments, users, and other object on the [SuperSaaS appointment scheduling](https://www.supersaas.com/) platform in Ruby.
 
-The SuperSaaS API provides services that can be used to add online booking and scheduling functionality to an existing website or CRM software.
+The SuperSaaS API provides endpoints that can be used to read or update information from your SuperSaaS account. 
+This can be useful to build an integration with back-end system or to extract information to generate reports.
 
 ## Prerequisites
 
 1. [Register for a (free) SuperSaaS account](https://www.supersaas.com/accounts/new), and
-2. get your account name and API key on the [Account Info](https://www.supersaas.com/accounts/edit) page.
+2. Get your account name and API key on the [Account Info](https://www.supersaas.com/accounts/edit) page.
 
-##### Dependencies
+### Dependencies
 
-Ruby 1.9 or greater.
-
-No external libraries. Only the native `json` and `net/http` standard libs are used.
+No external dependencies. Only the `json` and `net/http` gems from the ruby standard library are used.
 
 ## Installation
 
-1: Gemfile
-
-The SuperSaaS Ruby API Client is available from RubyGems and can be included in your project GemFile. Note, the supersaas-api-client may update major versions with breaking changes, so it's recommended to use a major version when expressing the gem dependency. e.g.
-
-    gem 'supersaas-api-client', '~> 2'
-
-2: System Gem
-
-You can install the SuperSaaS Ruby API Client globally by using the gem command. Open a terminal and enter the following command:
+Install with:
 
     $ gem install supersaas-api-client
+
+Alternatively, you can use `bundler` to install it by adding this line to you Gemfile. 
+The supersaas-api-client may update major versions with breaking changes, so it's recommended to use a major version when expressing the gem dependency. e.g.
+
+    gem 'supersaas-api-client', '~> 2'
 
 ## Configuration
 
@@ -66,26 +62,6 @@ All configuration options can be individually set on the client.
 Details of the data structures, parameters, and values can be found on the developer documentation site:
 
 https://www.supersaas.com/info/dev
-
-#### List Schedules
-
-Get all account schedules:
-
-    Supersaas::Client.instance.schedules.list #=> [<Supersaas::Schedule>, ...]
-    
-#### List Resource
-
-Get all services/resources by `schedule_id`:
-
-    Supersaas::Client.instance.schedules.resources(12345) #=> [<Supersaas::Resource>, ...]    
-
-_Note: does not work for capacity type schedules._
-
-#### List Fields of a Schedule
-
-Get all the available fields of a schedule by `schedule_id`:
-
-    Supersaas::Client.instance.schedules.field_list(12345) #=> [<Supersaas::FieldList>, ...]
 
 #### Create User
 
@@ -180,7 +156,7 @@ Get agenda (upcoming) slots by `schedule_id` and `user_id`, with `from_time` vie
 
     Supersaas::Client.instance.appointments.agenda_slots(12345, 67890, '2018-01-31 00:00:00') #=> [<Supersaas::Slot>, ...]    
 
-_Note: works only for capacity type schedules._
+_Note: only works for capacity type schedules._
 
 #### Get Available Appointments/Bookings
 
@@ -204,7 +180,7 @@ Get list of appointments by `schedule_id`, with `today`,`from` time, `to` time a
 
     Supersaas::Client.instance.appointments.range(12345, false, '2018-01-31 00:00:00', '2019-01-31 00:00:00', true) #=> [<Supersaas::Appointment>, ...]/[<Supersaas::Slot>, ...]
 
-#### List Template Forms
+#### List Forms
 
 Get all forms by template `superform_id`, with `from_time`, and `user` params ([see](https://www.supersaas.com/info/dev/form_api)):
 
@@ -218,7 +194,7 @@ Get a single form by `form_id`, will raise 404 error if not found:
 
 #### Get a list of SuperForms
 
-Get a list of SuperForms:
+Get a list of Form templates (SuperForms):
 
     Supersaas::Client.instance.forms.forms #=> [<Supersaas::SuperForm>, ...]
 
@@ -246,6 +222,27 @@ Duplicate a template promotion by giving (new) `id` and `template_code` in that 
 List Groups in an account ([see](https://www.supersaas.com/info/dev/information_api)):
 
     Supersaas::Client.instance.groups.list #=> [<Supersaas::Group>, ...]
+
+#### List Schedules
+
+Get all account schedules:
+
+    Supersaas::Client.instance.schedules.list #=> [<Supersaas::Schedule>, ...]
+
+#### List Services / Resources
+
+Get all services/resources by `schedule_id`:
+
+    Supersaas::Client.instance.schedules.resources(12345) #=> [<Supersaas::Resource>, ...]    
+
+_Note: does not work for capacity type schedules._
+
+#### List Fields of a Schedule
+
+Get all the available fields of a schedule by `schedule_id`:
+
+    Supersaas::Client.instance.schedules.field_list(12345) #=> [<Supersaas::FieldList>, ...]
+
 
 ## Examples
 
@@ -296,9 +293,6 @@ Some errors have more information and are printed to the log before raising the 
 + [SuperSaaS Registration](https://www.supersaas.com/accounts/new)
 + [Product Documentation](https://www.supersaas.com/info/support)
 + [Developer Documentation](https://www.supersaas.com/info/dev)
-+ [Python API Client](https://github.com/SuperSaaS/supersaas-python-api-client)
-+ [PHP API Client](https://github.com/SuperSaaS/supersaas-php-api-client)
-+ [NodeJS API Client](https://github.com/SuperSaaS/supersaas-nodejs-api-client)
 
 Contact: [support@supersaas.com](mailto:support@supersaas.com)
 
