@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 module Supersaas
   class UsersTest < SupersaasTest
     def setup
       @client = client_instance
-      @user_id = 12345
+      @user_id = 12_345
       @user_fk = '6789fk'
     end
 
@@ -27,7 +29,7 @@ module Supersaas
 
     def test_create
       refute_nil @client.users.create(user_attributes)
-      assert_last_request_path "/api/users.json"
+      assert_last_request_path '/api/users.json'
     end
 
     def test_create_fk
@@ -43,6 +45,11 @@ module Supersaas
     def test_delete
       refute_nil @client.users.delete(@user_id)
       assert_last_request_path "/api/users/#{@user_id}.json"
+    end
+
+    def test_field_list
+      refute_nil @client.users.field_list
+      assert_last_request_path '/api/field_list.json'
     end
 
     private

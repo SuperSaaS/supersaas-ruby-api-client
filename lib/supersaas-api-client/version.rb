@@ -1,4 +1,6 @@
+# frozen_string_literal: true
+
 module Supersaas
-  API_VERSION  = '2'
-  VERSION = '1.1.1'
+  API_VERSION = '3'
+  VERSION = '2.0.0'
 end

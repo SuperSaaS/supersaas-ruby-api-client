@@ -6,6 +6,7 @@
 /pkg/
 /spec/reports/
 /tmp/
+/supersaas-api-client/
 .DS_Store
 .idea/*
 *.gem
