@@ -83,6 +83,7 @@ module Supersaas
           slot_id: attributes[:slot_id]
         }
       }
+      params[:booking].compact!
       client.post(path, params)
     end
 
