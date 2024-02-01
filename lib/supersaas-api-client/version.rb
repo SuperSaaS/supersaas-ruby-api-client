@@ -2,5 +2,5 @@
 
 module Supersaas
   API_VERSION = '3'
-  VERSION = '2.0.0'
+  VERSION = '2.0.1'
 end
