@@ -86,9 +86,9 @@ module Supersaas
       # Represents the timestamp of the oldest request within the time window
       oldest_request = @queue.push(Time.now).shift
       # This ensures that the client does not make requests faster than the defined rate limit
-      if oldest_request && (d = Time.now - oldest_request) < WINDOW_SIZE
-        sleep WINDOW_SIZE - d
-      end
+      return unless oldest_request && (d = Time.now - oldest_request) < WINDOW_SIZE
+
+      sleep WINDOW_SIZE - d
     end
 
     def request(http_method, path, params = {}, query = {})
@@ -146,7 +146,7 @@ module Supersaas
       begin
         res = http.request(req)
       rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
-        Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
+             Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
         raise Supersaas::Exception, "HTTP Request Error (#{uri}#{path}): #{e.message}"
       end
 

@@ -5,10 +5,9 @@ module Supersaas
     # REF: https://www.supersaas.com/info/dev/promotion_api
     def list(limit = nil, offset = nil)
       path = '/promotions'
-      params = {
-        limit: limit && validate_number(limit),
-        offset: offset && validate_number(offset)
-      }
+      params = {}
+      params.merge!(limit: validate_number(limit)) if limit
+      params.merge!(offset: validate_number(offset)) if offset
       res = client.get(path, params)
       res.map { |attributes| Supersaas::Promotion.new(attributes) }
     end
