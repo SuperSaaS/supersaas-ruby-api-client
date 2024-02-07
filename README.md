@@ -172,15 +172,14 @@ Get recently changed appointments by `schedule_id`, with `from` time, `to` time,
 
     Supersaas::Client.instance.appointments.changes(12345, '2018-01-31 00:00:00', '2019-01-31 00:00:00',  true) #=> [<Supersaas::Appointment>, ...]
 
+#### Get range of appointments
 
-#### Get list of appointments
-
-Get list of appointments by `schedule_id`, with `today`,`from` time, `to` time and `slot` view params (see [docs](https://www.supersaas.com/info/dev/appointment_api#range)),
+Get range of appointments by `schedule_id`, with `today`, `from` time, `to` time and `slot` view params (see [docs](https://www.supersaas.com/info/dev/appointment_api#range)),
 `range(schedule_id, today = false, from_time = nil, to = nil, slot = false, user = nil, resource_id = nil, service_id = nil, limit = nil, offset = nil)`:
 
     Supersaas::Client.instance.appointments.range(12345, false, '2018-01-31 00:00:00', '2019-01-31 00:00:00', true) #=> [<Supersaas::Appointment>, ...]/[<Supersaas::Slot>, ...]
 
-#### List Forms
+#### List Template Forms
 
 Get all forms by template `superform_id`, with `from_time`, and `user` params ([see](https://www.supersaas.com/info/dev/form_api)):
 
@@ -200,8 +199,8 @@ Get a list of Form templates (SuperForms):
 
 #### List Promotions
 
-Get a list of promotional coupon codes with paging parameters `limit` and `offset` (see [docs](https://www.supersaas.com/info/dev/promotion_api)),
-`list(template_form_id, from_time = nil, user = nil)`:
+Get a list of promotional coupon codes with pagination parameters `limit` and `offset` (see [docs](https://www.supersaas.com/info/dev/promotion_api)),
+`list(from_time = nil, user = nil)`:
 
     Supersaas::Client.instance.promotions.list #=> [<Supersaas::Promotion>, ...]
 
@@ -213,9 +212,11 @@ Retrieve information about a single coupon code use with `promotion_code`:
 
 #### Duplicate promotion code
 
-Duplicate a template promotion by giving (new) `id` and `template_code` in that order:
+Duplicate a template promotion by giving (new) `promotion_code` and `template_code` in that order,
+duplicate_promotion_code(promotion_code, template_code):
 
-    Supersaas::Client.instance.promotions.duplicate_promotion_code(12345) #=> nil
+
+    Supersaas::Client.instance.promotions.duplicate_promotion_code(12345, 94832838) #=> nil
 
 #### List Groups in an account
 
