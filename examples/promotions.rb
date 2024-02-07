@@ -2,11 +2,11 @@
 
 require 'supersaas-api-client'
 
-puts "# SuperSaaS Promotions Example"
+puts '# SuperSaaS Promotions Example'
 
 unless Supersaas::Client.instance.account_name && Supersaas::Client.instance.api_key
-  puts "ERROR! Missing account credentials. Rerun the script with your credentials, e.g."
-  puts "SSS_API_ACCOUNT_NAME=<myaccountname> SSS_API_KEY=<xxxxxxxxxxxxxxxxxxxxxx> ./examples/users.rb"
+  puts 'ERROR! Missing account credentials. Rerun the script with your credentials, e.g.'
+  puts 'SSS_API_ACCOUNT_NAME=<myaccountname> SSS_API_KEY=<xxxxxxxxxxxxxxxxxxxxxx> ./examples/users.rb'
   return
 end
 
@@ -15,12 +15,12 @@ puts "## API KEY: #{'*' * Supersaas::Client.instance.api_key.size}"
 
 Supersaas::Client.instance.verbose = true
 
-puts "listing promotions..."
-puts "#### Supersaas::Client.instance.promotions.list"
+puts 'listing promotions...'
+puts '#### Supersaas::Client.instance.promotions.list'
 promotions = Supersaas::Client.instance.promotions.list
 
 [10, promotions.size].min&.times do |i|
-  puts "A promotion"
+  puts 'A promotion'
   puts "#### Supersaas::Client.instance.promotion(#{promotions[i].id})"
   Supersaas::Client.instance.promotions.promotion(promotions[i].code)
 end

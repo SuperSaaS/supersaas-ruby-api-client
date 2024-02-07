@@ -31,9 +31,9 @@ module Supersaas
         length: length_minutes && validate_number(length_minutes),
         from: validate_datetime(from_time),
         resource: resource,
-        full: full ? true : nil,
-        maxresults: limit && validate_number(limit)
+        full: full ? true : nil
       }
+      params.merge!(maxresults: validate_number(limit)) if limit
       res = client.get(path, params)
       map_slots_or_bookings(res)
     end
@@ -43,9 +43,9 @@ module Supersaas
       params = {
         schedule_id: validate_id(schedule_id),
         form: form ? true : nil,
-        start: start_time ? validate_datetime(start_time) : nil,
-        limit: limit && validate_number(limit)
+        start: start_time ? validate_datetime(start_time) : nil
       }
+      params.merge!(maxresults: validate_number(limit)) if limit
       res = client.get(path, params)
       map_slots_or_bookings(res)
     end
