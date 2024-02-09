@@ -45,7 +45,7 @@ module Supersaas
         form: form ? true : nil,
         start: start_time ? validate_datetime(start_time) : nil
       }
-      params.merge!(maxresults: validate_number(limit)) if limit
+      params.merge!(limit: validate_number(limit)) if limit
       res = client.get(path, params)
       map_slots_or_bookings(res)
     end
