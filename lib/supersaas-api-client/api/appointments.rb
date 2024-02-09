@@ -134,8 +134,8 @@ module Supersaas
               limit = nil, offset = nil)
       path = "/range/#{validate_id(schedule_id)}"
       params = {}
-      params.merge!(today: true) if today
       params = build_param(params, from_time, to, slot, user, limit, offset, resource_id, service_id)
+      params.merge!(today: true) if today
       res = client.get(path, params)
       map_slots_or_bookings(res)
     end
