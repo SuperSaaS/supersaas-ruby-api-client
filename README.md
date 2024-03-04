@@ -200,7 +200,7 @@ Get a list of Form templates (SuperForms):
 #### List Promotions
 
 Get a list of promotional coupon codes with pagination parameters `limit` and `offset` (see [docs](https://www.supersaas.com/info/dev/promotion_api)),
-`list(from_time = nil, user = nil)`:
+`list(limit = nil, offset = nil)`:
 
     Supersaas::Client.instance.promotions.list #=> [<Supersaas::Promotion>, ...]
 
@@ -213,8 +213,7 @@ Retrieve information about a single coupon code use with `promotion_code`:
 #### Duplicate promotion code
 
 Duplicate a template promotion by giving (new) `promotion_code` and `template_code` in that order,
-duplicate_promotion_code(promotion_code, template_code):
-
+`duplicate_promotion_code(promotion_code, template_code)`:
 
     Supersaas::Client.instance.promotions.duplicate_promotion_code(12345, 94832838) #=> nil
 
