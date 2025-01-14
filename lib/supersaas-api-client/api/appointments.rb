@@ -3,10 +3,10 @@
 module Supersaas
   # REF: https://www.supersaas.com/info/dev/appointment_api
   class Appointments < BaseApi
-    def agenda(schedule_id, user_id, from_time = nil, slot = false)
+    def agenda(schedule_id, user, from_time = nil, slot = false)
       path = "/agenda/#{validate_id(schedule_id)}"
       params = {
-        user: validate_present(user_id),
+        user: validate_present(user),
         from: from_time && validate_datetime(from_time)
       }
       params.merge!(slot: true) if slot
@@ -14,6 +14,7 @@ module Supersaas
       map_slots_or_bookings(res)
     end
 
+    # LEGACY METHOD WILL BE REMOVED USE AGENDA
     def agenda_slots(schedule_id, user_id, from_time = nil)
       path = "/agenda/#{validate_id(schedule_id)}"
       params = {
@@ -38,14 +39,16 @@ module Supersaas
       map_slots_or_bookings(res)
     end
 
-    def list(schedule_id, form = nil, start_time = nil, limit = nil)
+    def list(schedule_id, form = nil, start_time = nil, limit = nil, finish = nil, offset = nil)
       path = '/bookings'
       params = {
         schedule_id: validate_id(schedule_id),
         form: form ? true : nil,
-        start: start_time ? validate_datetime(start_time) : nil
+        start: start_time ? validate_datetime(start_time) : nil,
+        finish: finish ? validate_datetime(finish) : nil
       }
       params.merge!(limit: validate_number(limit)) if limit
+      params.merge!(offset: validate_number(offset)) if offset
       res = client.get(path, params)
       map_slots_or_bookings(res)
     end
@@ -67,8 +70,8 @@ module Supersaas
         booking: {
           start: attributes[:start],
           finish: attributes[:finish],
-          name: attributes[:name],
           email: attributes[:email],
+          res_name: attributes[:name],
           full_name: attributes[:full_name],
           address: attributes[:address],
           mobile: attributes[:mobile],
@@ -94,8 +97,8 @@ module Supersaas
         booking: {
           start: attributes[:start],
           finish: attributes[:finish],
-          name: attributes[:name],
           email: attributes[:email],
+          res_name: attributes[:name],
           full_name: attributes[:full_name],
           address: attributes[:address],
           mobile: attributes[:mobile],
@@ -117,9 +120,10 @@ module Supersaas
       client.put(path, params)
     end
 
-    def delete(schedule_id, appointment_id)
+    def delete(schedule_id, appointment_id, webhook = nil)
       path = "/bookings/#{validate_id(appointment_id)}"
       params = { schedule_id: validate_id(schedule_id) }
+      params.merge!(webhook: webhook) if webhook
       client.delete(path, nil, params)
     end
 
@@ -130,8 +134,8 @@ module Supersaas
       map_slots_or_bookings(res)
     end
 
-    def range(schedule_id, today = false, from_time = nil, to = nil, slot = false, user = nil, resource_id = nil, service_id = nil,
-              limit = nil, offset = nil)
+    def range(schedule_id, today = false, from_time = nil, to = nil, slot = false, user = nil, resource_id = nil,
+              service_id = nil, limit = nil, offset = nil)
       path = "/range/#{validate_id(schedule_id)}"
       params = {}
       params = build_param(params, from_time, to, slot, user, limit, offset, resource_id, service_id)

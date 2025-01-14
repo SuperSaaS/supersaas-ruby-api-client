@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'test_helper'
+require 'time'
 
 module Supersaas
   class ClientTest < SupersaasTest
@@ -43,6 +44,27 @@ module Supersaas
       assert_equal 'http://test', Supersaas::Client.configuration.host
       assert_equal true, Supersaas::Client.configuration.dry_run
       assert_equal true, Supersaas::Client.configuration.verbose
+    end
+
+    def test_rate_limit
+      return unless ENV['SSS_RUBY_RATE_LIMITER_TEST'] == 'true'
+
+      client = Supersaas::Client.new
+      client.account_name = 'test'
+      client.api_key = 'test'
+      client.dry_run = true
+
+      start_time = Time.now
+
+      # Make multiple requests
+      5.times do
+        client.get('/test')
+      end
+
+      end_time = Time.now
+      elapsed_time = end_time - start_time
+
+      assert_operator elapsed_time, :>=, 4.0, "Rate limiting should cause 5 requests to take at least 4 seconds, took #{elapsed_time}"
     end
   end
 end
