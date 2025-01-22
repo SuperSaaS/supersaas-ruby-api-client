@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'test_helper'
+require 'time'
 
 module Supersaas
   class ClientTest < SupersaasTest
@@ -43,6 +44,48 @@ module Supersaas
       assert_equal 'http://test', Supersaas::Client.configuration.host
       assert_equal true, Supersaas::Client.configuration.dry_run
       assert_equal true, Supersaas::Client.configuration.verbose
+    end
+
+    def test_rate_limit
+      return unless ENV['SSS_RUBY_RATE_LIMITER_TEST'] == 'true'
+
+      client = Supersaas::Client.new
+      client.account_name = 'test'
+      client.api_key = 'test'
+      client.dry_run = true
+
+      # Max burst allowed without errors
+      Client::MAX_REQUESTS.times do
+        start_time = Time.now
+        client.send(:throttle)
+        end_time = Time.now
+        elapsed_time = end_time - start_time
+        assert_operator elapsed_time, :<, 0.1, "Expected no throttling, but got a delay of #{elapsed_time} seconds"
+      end
+
+      # Wait for window to reset
+      sleep(Client::WINDOW_SIZE + 0.1) # Added a small buffer
+
+      # Another burst of MAX_REQUESTS should now be allowed
+      Client::MAX_REQUESTS.times do
+        start_time = Time.now
+        client.send(:throttle)
+        end_time = Time.now
+        elapsed_time = end_time - start_time
+        assert_operator elapsed_time, :<, 0.1, "Expected no throttling, but got a delay of #{elapsed_time} seconds"
+      end
+
+      # Wait for window to expire and reset
+      sleep(Client::WINDOW_SIZE + 0.1)
+
+      # Test longer throttling so that we don't get massive self DDOS
+      start_time = Time.now
+      20.times do
+        client.send(:throttle)
+      end
+      end_time = Time.now
+      elapsed_time = end_time - start_time
+      assert_operator elapsed_time, :<, 4.1, "Expected throttling, #{elapsed_time} seconds"
     end
   end
 end

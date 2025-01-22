@@ -10,13 +10,17 @@ module Supersaas
         limit: limit && validate_number(limit),
         offset: offset && validate_number(offset)
       }
+      params.compact!
       res = client.get(path, params)
       res.map { |attributes| Supersaas::User.new(attributes) }
     end
 
-    def get(user_id)
+    def get(user_id, form = nil)
       path = user_path(user_id)
-      res = client.get(path)
+      params = {
+        form: form ? true : nil
+      }
+      res = client.get(path, params)
       Supersaas::User.new(res)
     end
 
@@ -39,9 +43,11 @@ module Supersaas
           field_2: attributes[:field_2],
           super_field: attributes[:super_field],
           credit: attributes[:credit] && validate_number(attributes[:credit]),
-          role: attributes[:role] && validate_options(attributes[:role], User::ROLES)
+          role: attributes[:role] && validate_options(attributes[:role], User::ROLES),
+          group: attributes[:group] && validate_number(attributes[:group])
         }
       }
+      params[:user].compact!
       client.post(path, params, query)
     end
 
@@ -64,16 +70,18 @@ module Supersaas
           field_2: attributes[:field_2],
           super_field: attributes[:super_field],
           credit: attributes[:credit] && validate_number(attributes[:credit]),
-          role: attributes[:role] && validate_options(attributes[:role], User::ROLES)
+          role: attributes[:role] && validate_options(attributes[:role], User::ROLES),
+          group: attributes[:group] && validate_number(attributes[:group])
         }
       }
       params[:user].compact!
       client.put(path, params, query)
     end
 
-    def delete(user_id)
+    def delete(user_id, webhook = nil)
       path = user_path(user_id)
-      client.delete(path)
+      params = { webhook: webhook }
+      client.delete(path, nil, params)
     end
 
     def field_list

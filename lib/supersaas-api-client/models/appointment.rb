@@ -2,10 +2,11 @@
 
 module Supersaas
   class Appointment < BaseModel
-    attr_accessor :address, :country, :created_by, :created_on, :deleted, :description, :email, :field_1, :field_2,
-                  :field_1_r, :field_2_r, :finish, :form_id, :full_name, :id, :mobile, :name, :phone, :price, :res_name,
-                  :resource_id, :schedule_id, :schedule_name, :service_id, :service_name, :slot_id, :start, :status,
-                  :super_field, :updated_by, :updated_on, :user_id, :waitlisted
+    attr_accessor :field_1, :field_2, :field_2_r, :field_1_r, :country, :address, :mobile, :phone, :email, :price_cents,
+                  :finish, :start, :service_name, :res_name, :id, :quantity, :status_message, :deleted,
+                  :created_on, :slot_id, :created_by, :price, :status, :full_name, :super_field, :updated_by, :form_id,
+                  :updated_on, :user_id, :waitlisted, :resource_id, :schedule_name, :schedule_id, :service_id
+
     attr_reader :form, :slot
 
     def form=(value)

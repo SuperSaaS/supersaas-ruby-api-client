@@ -62,8 +62,10 @@ Naming/VariableNumber:
     - 'lib/supersaas-api-client/api/appointments.rb'
     - 'lib/supersaas-api-client/api/users.rb'
     - 'lib/supersaas-api-client/models/appointment.rb'
+    - 'lib/supersaas-api-client/models/user.rb'
     - 'test/appointments_test.rb'
     - 'test/users_test.rb'
+
 
 # Offense count: 18
 # Configuration parameters: AllowedConstants.
