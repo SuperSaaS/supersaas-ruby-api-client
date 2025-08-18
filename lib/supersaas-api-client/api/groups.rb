@@ -4,7 +4,7 @@ module Supersaas
   class Groups < BaseApi
     # REF: https://www.supersaas.com/info/dev/information_api#groups
     def list
-      path = '/groups'
+      path = "/groups"
       res = client.get(path)
       res.map { |attributes| Supersaas::Group.new(attributes) }
     end
