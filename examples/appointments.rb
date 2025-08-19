@@ -37,7 +37,6 @@ unless user_id
   puts "#New user created #{user_id}"
 end
 
-description = nil
 if user_id
   description = "1234567890."
   params = {full_name: "Example", description: description, name: "example@example.com", email: "example@example.com",

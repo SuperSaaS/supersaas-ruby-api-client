@@ -67,10 +67,10 @@ module Supersaas
     end
 
     def test_request_path_formatting
-      result = @client.get("/test")
+      @client.get("/test")
       assert_equal "/api/test.json", @client.last_request.path
 
-      result = @client.get("/test.json")
+     @client.get("/test.json")
       assert_equal "/api/test.json", @client.last_request.path
     end
 
