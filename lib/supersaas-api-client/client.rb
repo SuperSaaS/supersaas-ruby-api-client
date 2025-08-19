@@ -1,12 +1,7 @@
 # frozen_string_literal: true
 
-require "net/http"
-require "uri"
-require "json"
-require "logger"
-require "timeout"
-
 module Supersaas
+  # noinspection RubyTooManyInstanceVariablesInspection
   class Client
     class << self
       attr_accessor :configuration
@@ -15,8 +10,11 @@ module Supersaas
         Thread.current["SUPER_SAAS_CLIENT"] = nil
       end
 
-      def instance(configuration = nil)
-        Thread.current["SUPER_SAAS_CLIENT"] ||= new(configuration || Configuration.new)
+      def instance(configuration = nil, **options)
+        if configuration
+          reset_instance!
+        end
+        Thread.current["SUPER_SAAS_CLIENT"] ||= new(configuration || Configuration.new, **options)
       end
 
       def user_agent
@@ -31,8 +29,21 @@ module Supersaas
       @configuration = configuration || Configuration.new
       @configuration.validate!
 
+      validate_options!(options)
       @rate_limiter = RateLimiter.new
       @http_client = HttpClient.new(@configuration, **options)
+      reset_service_objects
+    end
+
+    def reload!(configuration: nil, **options)
+      @configuration = configuration || @configuration
+      @configuration.validate!
+
+      validate_options!(options)
+      @rate_limiter = RateLimiter.new
+      @http_client = HttpClient.new(@configuration, **options)
+      reset_service_objects
+      self
     end
 
     def appointments
@@ -63,12 +74,16 @@ module Supersaas
       rate_limiter.throttle
     end
 
-    %i[get post put delete].each do |method|
+    def get(path, query = {})
+      request(:get, path, {}, query)
+    end
+
+    %i[post put delete].each do |method|
       define_method(method) do |path, params = {}, query = {}|
-        params, query = {}, params if method == :get && query.empty? && !params.empty?
         request(method, path, params, query)
       end
     end
+
 
     private
 
@@ -76,9 +91,19 @@ module Supersaas
 
     def request(method, path, params = {}, query = {})
       rate_limiter.throttle
-      req = http_client.request(method, path, params, query)
+      resp = http_client.request(method, path, params, query)
       @last_request = http_client.last_request
-      req
+      resp
+    end
+
+    def validate_options!(options)
+      valid_keys = %i[timeout open_timeout read_timeout write_timeout retries logger verbose dry_run]
+      invalid = options.keys - valid_keys
+      raise ArgumentError, "Unknown options: #{invalid.join(", ")}" unless invalid.empty?
+    end
+
+    def reset_service_objects
+      @appointments = @forms = @schedules = @users = @promotions = @groups = nil
     end
   end
 end

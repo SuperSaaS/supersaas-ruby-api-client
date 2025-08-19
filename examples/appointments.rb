@@ -46,8 +46,8 @@ if user_id
     params[:slot_id] = ENV.fetch("SSS_API_SLOT", nil)
   else
     days = rand(1..30)
-    params[:start] = Time.now + (days * 24 * 60 * 60)
-    params[:finish] = params[:start] + (60 * 60)
+    params[:start] = (Time.now.to_i + (days * 86400)).to_s  # 86400 seconds in a day
+    params[:finish] = (params[:start].to_i + 3600).to_s     # 3600 seconds in an hour
   end
   puts "creating new appointment..."
   puts "#### Supersaas::Client.instance.appointments.create(#{schedule_id}, #{user_id}, {...})"

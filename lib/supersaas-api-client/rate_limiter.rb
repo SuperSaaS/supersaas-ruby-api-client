@@ -2,8 +2,9 @@
 
 module Supersaas
   class RateLimiter
-    WINDOW_SIZE = 1 # seconds
-    MAX_REQUESTS = 4
+    WINDOW_SIZE = 1.freeze # seconds
+    MAX_REQUESTS = 4.freeze
+    TIMING_TOLERANCE = 0.001.freeze # For floating point comparisons
 
     def initialize
       @mutex = Mutex.new
@@ -32,9 +33,16 @@ module Supersaas
     def wait_if_rate_limited(now)
       return unless @request_times.size >= MAX_REQUESTS
 
-      sleep_time = WINDOW_SIZE - (now - @request_times.first)
-      sleep(sleep_time) if sleep_time > 0
-      cleanup_old_requests(current_time)
+      # Recalculate after potential cleanup
+      oldest_request = @request_times.first
+      sleep_time = WINDOW_SIZE - (now - oldest_request)
+
+      if sleep_time > 0
+        sleep(sleep_time)
+        # Update now after sleep and cleanup again
+        updated_now = current_time
+        cleanup_old_requests(updated_now)
+      end
     end
 
     def record_request(now)

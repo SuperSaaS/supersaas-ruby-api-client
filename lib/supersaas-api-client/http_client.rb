@@ -1,4 +1,11 @@
 # lib/supersaas-api-client/http_client.rb
+
+require "net/http"
+require "uri"
+require "json"
+require "logger"
+require "timeout"
+
 module Supersaas
   class HttpClient
     DEFAULT_TIMEOUTS = {
@@ -44,8 +51,6 @@ module Supersaas
       else
         URI.parse(Supersaas::Client.configuration&.host || Configuration::DEFAULT_HOST)
       end
-      # host = @config.host.presence || Configuration::DEFAULT_HOST
-      # URI.parse(host)
     end
 
     def create_http_connection(uri)
@@ -112,7 +117,13 @@ module Supersaas
     end
 
     def should_retry?(attempts, _error)
-      attempts <= @max_retries
+      return false if attempts > @max_retries
+
+      # Retry on network errors or specific HTTP status codes
+      return true if network_errors.any? { |err| error.is_a?(err) }
+      return true if error.is_a?(Supersaas::Exception) && error.message.include?("429") # Rate limit
+
+      false
     end
 
     def handle_response(response)
@@ -121,6 +132,7 @@ module Supersaas
       code = response.code.to_i
       body = json_body(response)
 
+      log_errors(body) if body[:errors] || body["errors"]
       case code
       when 200, 201 then handle_success_response(response, body)
       when 400 then raise Supersaas::Exception, "Bad Request (400)"
@@ -144,20 +156,6 @@ module Supersaas
       end
     end
 
-    def handle_errors(code, body)
-      log_errors(body)
-      case code
-      when 400
-        raise Supersaas::Exception, "HTTP Request Error: Bad Request"
-      when 501
-        raise Supersaas::Exception, "Not yet implemented for service type schedule"
-      when 405
-        raise Supersaas::Exception, "Not available for capacity type schedule"
-      else
-        raise Supersaas::Exception, "HTTP Request Error: #{code}"
-      end
-    end
-
     def log_errors(body)
       errors = body[:errors] || body["errors"]
       return unless errors.is_a?(Array)
@@ -169,10 +167,10 @@ module Supersaas
       end
     end
 
-    def json_body(res)
-      return {} unless res.body&.size&.positive?
+    def json_body(response)
+      return {} unless response.body&.size&.positive?
 
-      JSON.parse(res.body, symbolize_names: true)
+      JSON.parse(response.body, symbolize_names: true)
     rescue JSON::ParserError => e
       @logger.debug("Failed to parse JSON response: #{e.message}")
       {}
@@ -181,7 +179,8 @@ module Supersaas
     def delete_blank_values(hash)
       return hash unless hash
 
-      hash.dup.delete_if { |_k, v| v.nil? || v == "" || (v.is_a?(Hash) && v.compact.empty?) }
+      cleaned = hash.reject { |_k, v| v.nil? || v == "" || (v.is_a?(Hash) && v.compact.empty?) }
+      cleaned.empty? && !hash.empty? ? {} : cleaned
     end
 
     def log_response(response)
