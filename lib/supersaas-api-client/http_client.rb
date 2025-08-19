@@ -1,4 +1,4 @@
-# lib/supersaas-api-client/http_client.rb
+# frozen_string_literal: true
 
 require "net/http"
 require "uri"
@@ -13,6 +13,12 @@ module Supersaas
       read: 15,
       write: 10
     }.freeze
+
+    NETWORK_ERRORS = [
+      Timeout::Error, Errno::ECONNRESET, EOFError,
+      Net::OpenTimeout, Net::ReadTimeout, Net::HTTPBadResponse,
+      Net::HTTPHeaderSyntaxError, Net::ProtocolError
+    ].freeze
 
     attr_reader :last_request
 
@@ -30,6 +36,7 @@ module Supersaas
       http = create_http_connection(uri)
       request = build_request(method, path, params, query)
       @last_request = request
+
       log_request(method, path, params) if @config.verbose
       return {} if @config.dry_run
 
@@ -38,6 +45,7 @@ module Supersaas
 
     private
 
+    # Validation methods
     def validate_method!(method)
       valid_methods = %i[get post put delete]
       return if valid_methods.include?(method)
@@ -45,12 +53,11 @@ module Supersaas
       raise Supersaas::Exception, "Invalid HTTP Method: #{method}. Only #{valid_methods.join(", ")} supported."
     end
 
+    # URI and connection setup
     def build_uri
-      if @config.host && !@config.host.empty?
-        URI.parse(@config.host)
-      else
-        URI.parse(Supersaas::Client.configuration&.host || Configuration::DEFAULT_HOST)
-      end
+      host = @config.host&.empty? ? nil : @config.host
+      host ||= Supersaas::Client.configuration&.host || Configuration::DEFAULT_HOST
+      URI.parse(host)
     end
 
     def create_http_connection(uri)
@@ -62,24 +69,29 @@ module Supersaas
       http
     end
 
+    # Request building
     def build_request(method, path, params, query)
       clean_params = delete_blank_values(params)
       clean_query = delete_blank_values(query)
-
       full_path = build_path(path, clean_query)
+
       request = Net::HTTP.const_get(method.capitalize).new(full_path)
-
-      set_request_headers(request)
-      set_request_auth(request)
-      set_request_body(request, clean_params, method)
-
+      configure_request(request, clean_params, method)
       request
     end
 
     def build_path(path, query)
-      full_path = "/api#{path}.json"
+      # Remove existing .json extension if present, then add it
+      clean_path = path.sub(/\.json$/, '')
+      full_path = "/api#{clean_path}.json"
       full_path += "?#{URI.encode_www_form(query)}" if query.any?
       full_path
+    end
+
+    def configure_request(request, params, method)
+      set_request_headers(request)
+      set_request_auth(request)
+      set_request_body(request, params, method)
     end
 
     def set_request_headers(request)
@@ -96,43 +108,48 @@ module Supersaas
       request.body = params.to_json unless method == :get
     end
 
+    # Request execution and retry logic
     def execute_with_retries(http, request)
       attempts = 0
+
       begin
         attempts += 1
         response = http.request(request)
         handle_response(response)
-      rescue *network_errors => e
+      rescue *NETWORK_ERRORS => e
         retry if should_retry?(attempts, e)
         raise Supersaas::Exception, "HTTP Request Error: #{e.message}"
       end
     end
 
-    def network_errors
-      [
-        Timeout::Error, Errno::ECONNRESET, EOFError,
-        Net::OpenTimeout, Net::ReadTimeout, Net::HTTPBadResponse,
-        Net::HTTPHeaderSyntaxError, Net::ProtocolError
-      ]
-    end
-
-    def should_retry?(attempts, _error)
+    def should_retry?(attempts, error)
       return false if attempts > @max_retries
-
-      # Retry on network errors or specific HTTP status codes
-      return true if network_errors.any? { |err| error.is_a?(err) }
-      return true if error.is_a?(Supersaas::Exception) && error.message.include?("429") # Rate limit
+      return true if NETWORK_ERRORS.any? { |err| error.is_a?(err) }
+      return true if rate_limit_error?(error)
 
       false
     end
 
+    def rate_limit_error?(error)
+      error.is_a?(Supersaas::Exception) && error.message.include?("429")
+    end
+
+    # Response handling
     def handle_response(response)
       log_response(response) if @config.verbose
 
       code = response.code.to_i
       body = json_body(response)
 
-      log_errors(body) if body[:errors] || body["errors"]
+      log_errors(body) if has_errors?(body)
+      process_status_code(code, response, body)
+    end
+
+    def has_errors?(body)
+      body[:errors] || body["errors"]
+    end
+
+    def process_status_code(code, response, body)
       case code
       when 200, 201 then handle_success_response(response, body)
       when 400 then raise Supersaas::Exception, "Bad Request (400)"
@@ -149,24 +166,11 @@ module Supersaas
     end
 
     def handle_success_response(response, body)
-      if response["location"]&.include?("www.supersaas.com")
-        response["location"]
-      else
-        body
-      end
+      location = response["location"]
+      location&.include?("www.supersaas.com") ? location : body
     end
 
-    def log_errors(body)
-      errors = body[:errors] || body["errors"]
-      return unless errors.is_a?(Array)
-
-      errors.each do |error|
-        code = error[:code] || error["code"]
-        title = error[:title] || error["title"]
-        @logger.debug("Error code: #{code}, #{title}")
-      end
-    end
-
+    # Utility methods
     def json_body(response)
       return {} unless response.body&.size&.positive?
 
@@ -179,8 +183,24 @@ module Supersaas
     def delete_blank_values(hash)
       return hash unless hash
 
-      cleaned = hash.reject { |_k, v| v.nil? || v == "" || (v.is_a?(Hash) && v.compact.empty?) }
+      cleaned = hash.reject { |_k, v| blank_value?(v) }
       cleaned.empty? && !hash.empty? ? {} : cleaned
+    end
+
+    def blank_value?(value)
+      value.nil? || value == "" || (value.is_a?(Hash) && value.compact.empty?)
+    end
+
+    # Logging methods
+    def log_errors(body)
+      errors = body[:errors] || body["errors"]
+      return unless errors.is_a?(Array)
+
+      errors.each do |error|
+        code = error[:code] || error["code"]
+        title = error[:title] || error["title"]
+        @logger.debug("Error code: #{code}, #{title}")
+      end
     end
 
     def log_response(response)

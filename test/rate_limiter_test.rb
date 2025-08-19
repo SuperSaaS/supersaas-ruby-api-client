@@ -8,6 +8,7 @@ module Supersaas
       @client = client_instance
     end
 
+    # Basic rate limiting behavior tests
     def test_allows_max_requests_without_delay
       start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
@@ -28,6 +29,7 @@ module Supersaas
       assert_operator elapsed, :<=, 1.1, "Should not over-throttle significantly"
     end
 
+    # Request tracking tests
     def test_request_times_tracking
       initial_count = request_times_count
 
@@ -55,6 +57,7 @@ module Supersaas
       assert_equal 4, request_times_count, "Should keep recent requests and add new one"
     end
 
+    # Thread safety tests
     def test_thread_safety_maintains_consistency
       request_count = 6
       threads = Array.new(3) do
@@ -76,6 +79,7 @@ module Supersaas
       end
     end
 
+    # Sliding window algorithm tests
     def test_sliding_window_calculation
       # Fill the limit
       RateLimiter::MAX_REQUESTS.times { @client.throttle }
@@ -94,13 +98,6 @@ module Supersaas
       assert_in_delta expected_wait, actual_wait, 0.1, "Should wait for calculated sliding window time"
     end
 
-    def test_rate_limiter_constants
-      assert_equal 1, RateLimiter::WINDOW_SIZE
-      assert_equal 4, RateLimiter::MAX_REQUESTS
-      assert_instance_of Integer, RateLimiter::WINDOW_SIZE
-      assert_instance_of Integer, RateLimiter::MAX_REQUESTS
-    end
-
     def test_multiple_rapid_requests_spread_over_time
       total_requests = RateLimiter::MAX_REQUESTS * 2
       start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -112,6 +109,14 @@ module Supersaas
 
       assert_operator total_elapsed, :>=, minimum_expected - 0.1
       assert_operator request_times_count, :<=, RateLimiter::MAX_REQUESTS, "Should maintain window size"
+    end
+
+    # Configuration tests
+    def test_rate_limiter_constants
+      assert_equal 1, RateLimiter::WINDOW_SIZE
+      assert_equal 4, RateLimiter::MAX_REQUESTS
+      assert_instance_of Integer, RateLimiter::WINDOW_SIZE
+      assert_instance_of Integer, RateLimiter::MAX_REQUESTS
     end
 
     private

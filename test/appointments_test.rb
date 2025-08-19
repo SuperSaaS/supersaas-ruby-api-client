@@ -95,5 +95,58 @@ module Supersaas
         super_field: "sf"
       }
     end
+
+    def test_create_with_time_calculations
+      days = 5
+      start_time = Time.now + (days * 86400)
+      finish_time = start_time + 3600
+
+      params = appointment_attributes.merge(
+        start: start_time.to_s,
+        finish: finish_time.to_s
+      )
+
+      refute_nil @client.appointments.create(@schedule_id, @user_id, params, true, true)
+      assert_last_request_path "/api/bookings.json"
+    end
+
+    def test_list_with_all_parameters
+      start_time = Time.now
+      limit = 25
+      form = false
+
+      refute_nil @client.appointments.list(@schedule_id, form, start_time, limit)
+      assert_last_request_path "/api/bookings.json?schedule_id=#{@schedule_id}&form=false&#{URI.encode_www_form(start: start_time.strftime("%Y-%m-%d %H:%M:%S"))}&limit=#{limit}"
+    end
+
+    def test_changes_with_to_parameter
+      from = "2017-01-31 14:30:00"
+      to = "2017-02-28 23:59:59"
+
+      refute_nil @client.appointments.changes(@schedule_id, from, to)
+      assert_last_request_path "/api/changes/#{@schedule_id}.json?#{URI.encode_www_form(from: from, to: to)}"
+    end
+
+    def test_agenda_with_from_parameter
+      from_time = Time.now
+
+      refute_nil @client.appointments.agenda(@schedule_id, @user_id, from_time)
+      assert_last_request_path "/api/agenda/#{@schedule_id}.json?user=#{@user_id}&#{URI.encode_www_form(from: from_time.strftime("%Y-%m-%d %H:%M:%S"))}"
+    end
+
+    def test_create_with_slot_id
+      params = appointment_attributes.merge(slot_id: "12345")
+
+      refute_nil @client.appointments.create(@schedule_id, @user_id, params)
+      assert_last_request_path "/api/bookings.json"
+    end
+
+    def test_changes_with_datetime_objects
+      from = DateTime.now - 1
+      to = DateTime.now + 1
+
+      refute_nil @client.appointments.changes(@schedule_id, from, to)
+      # Verify DateTime objects are properly converted to strings
+    end
   end
 end
