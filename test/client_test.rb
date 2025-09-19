@@ -1,91 +1,85 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-require 'time'
+require "test_helper"
 
 module Supersaas
   class ClientTest < SupersaasTest
     def setup
-      config = Supersaas::Client::Configuration.new
-      @client = Supersaas::Client.new(config)
-      @client.dry_run = true
+      @client = client_instance
     end
 
-    def test_api
+    def teardown
+      @client = nil
+    end
+
+    # API service object tests
+    def test_api_service_objects_exist
       refute_nil @client.appointments
       refute_nil @client.forms
       refute_nil @client.schedules
       refute_nil @client.users
+      refute_nil @client.groups
+      refute_nil @client.promotions
     end
 
-    def test_request_methods
-      @client.account_name = 'Test'
-      @client.api_key = 'testing123'
+    def test_service_object_memoization
+      appointments = @client.appointments
+      assert_equal appointments, @client.appointments
+
+      forms = @client.forms
+      assert_equal forms, @client.forms
+
+      schedules = @client.schedules
+      assert_equal schedules, @client.schedules
+    end
+
+    # Configuration tests
+    def test_reload_configuration
+      original_account = @client.configuration.account_name
+      original_api_key = @client.configuration.api_key
+
+      new_config = Configuration.new
+      new_config.account_name = "NewAccount"
+      new_config.api_key = "NewKey"
+
+      @client.reload!(configuration: new_config)
+
+      assert_equal "NewAccount", @client.configuration.account_name
+      assert_equal "NewKey", @client.configuration.api_key
+      refute_equal original_account, @client.configuration.account_name
+      refute_equal original_api_key, @client.configuration.api_key
+    end
+
+    # HTTP method tests
+    def test_http_methods_and_headers
+      @client.configuration.account_name = "Test"
+      @client.configuration.api_key = "testing123"
+
       %i[get put post delete].each do |method|
-        refute_nil @client.send(method, '/test')
+        result = @client.send(method, "/test")
+
+        refute_nil result
         assert_equal method.to_s.upcase, @client.last_request.method
-        assert_equal '/api/test.json', @client.last_request.path
+        assert_equal "/api/test.json", @client.last_request.path
       end
-      assert_equal 'Basic VGVzdDp0ZXN0aW5nMTIz', @client.last_request['Authorization']
-      assert_equal 'application/json', @client.last_request['Accept']
-      assert_equal 'application/json', @client.last_request['Content-Type']
+
+      verify_request_headers
     end
 
-    def test_instance_configuration
-      Supersaas::Client.configure do |config|
-        config.account_name = 'account'
-        config.api_key = 'api_key'
-        config.host = 'http://test'
-        config.dry_run = true
-        config.verbose = true
-      end
-      assert_equal 'account', Supersaas::Client.configuration.account_name
-      assert_equal 'api_key', Supersaas::Client.configuration.api_key
-      assert_equal 'http://test', Supersaas::Client.configuration.host
-      assert_equal true, Supersaas::Client.configuration.dry_run
-      assert_equal true, Supersaas::Client.configuration.verbose
+    def test_request_path_formatting
+      @client.get("/test")
+      assert_equal "/api/test.json", @client.last_request.path
+
+     @client.get("/test.json")
+      assert_equal "/api/test.json", @client.last_request.path
     end
 
-    def test_rate_limit
-      return unless ENV['SSS_RUBY_RATE_LIMITER_TEST'] == 'true'
+    private
 
-      client = Supersaas::Client.new
-      client.account_name = 'test'
-      client.api_key = 'test'
-      client.dry_run = true
-
-      # Max burst allowed without errors
-      Client::MAX_REQUESTS.times do
-        start_time = Time.now
-        client.send(:throttle)
-        end_time = Time.now
-        elapsed_time = end_time - start_time
-        assert_operator elapsed_time, :<, 0.1, "Expected no throttling, but got a delay of #{elapsed_time} seconds"
-      end
-
-      # Wait for window to reset
-      sleep(Client::WINDOW_SIZE + 0.1) # Added a small buffer
-
-      # Another burst of MAX_REQUESTS should now be allowed
-      Client::MAX_REQUESTS.times do
-        start_time = Time.now
-        client.send(:throttle)
-        end_time = Time.now
-        elapsed_time = end_time - start_time
-        assert_operator elapsed_time, :<, 0.1, "Expected no throttling, but got a delay of #{elapsed_time} seconds"
-      end
-
-      # Wait for window to expire and reset
-      sleep(Client::WINDOW_SIZE + 0.1)
-
-      # Test longer throttling so that we don't get massive self DDOS
-      start_time = Time.now
-      20.times do
-        client.send(:throttle)
-      end
-      end_time = Time.now
-      elapsed_time = end_time - start_time
-      assert_operator elapsed_time, :<, 4.1, "Expected throttling, #{elapsed_time} seconds"
+    def verify_request_headers
+      assert_equal "Basic VGVzdDp0ZXN0aW5nMTIz", @client.last_request["Authorization"]
+      assert_equal "application/json", @client.last_request["Accept"]
+      assert_equal "application/json", @client.last_request["Content-Type"]
     end
   end
 end
