@@ -181,6 +181,41 @@ Get range of appointments by `schedule_id`, with `today`, `from` time, `to` time
 
     Supersaas::Client.instance.appointments.range(12345, false, '2018-01-31 00:00:00', '2019-01-31 00:00:00', true) #=> [<Supersaas::Appointment>, ...]/[<Supersaas::Slot>, ...]
 
+#### List Slots
+
+List the slots of a capacity type schedule by `schedule_id`, with optional `start_time`, `finish`, `limit` (default 100, max 2500) and `offset` view params,
+`list(schedule_id, start_time = nil, finish = nil, limit = nil, offset = nil)`:
+
+    Supersaas::Client.instance.slots.list(12345, '2018-01-31 00:00:00', '2019-01-31 00:00:00', 50) #=> [<Supersaas::Slot>, ...]
+
+_Note: slots only work for capacity type schedules, other schedule types raise an error._
+
+#### Get Slot
+
+Get a single slot by `schedule_id` and `slot_id`:
+
+    Supersaas::Client.instance.slots.get(12345, 67890) #=> <Supersaas::Slot>
+
+#### Create Slot
+
+Create a slot with `schedule_id` and slot attributes (`start`, `finish`, `title`, `description`, `location`, `capacity`, `price`, `color`),
+`create(schedule_id, attributes)`. A `capacity` of `'-'` means unlimited, `0` means no places:
+
+    Supersaas::Client.instance.slots.create(12345, {start: '2018-01-31 14:00:00', finish: '2018-01-31 15:00:00', title: 'Yoga', capacity: 10}) #=> http://www.supersaas.com/api/slots/67890.json
+
+#### Update Slot
+
+Update a slot by `schedule_id` and `slot_id` with slot attributes, see the above link,
+`update(schedule_id, slot_id, attributes)`:
+
+    Supersaas::Client.instance.slots.update(12345, 67890, {title: 'Advanced Yoga', capacity: '-'}) #=> {}
+
+#### Delete Slot
+
+Delete a single slot by `schedule_id` and `slot_id`. Bookings on the slot are deleted as well:
+
+    Supersaas::Client.instance.slots.delete(12345, 67890) #=> {}
+
 #### List Template Forms
 
 Get all forms by template `superform_id`, with `from_time`, and `user` params ([see](https://www.supersaas.com/info/dev/form_api)) and `limit`/`offset` pagination params:
