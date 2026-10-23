@@ -47,6 +47,10 @@ module Supersaas
       @schedules ||= Schedules.new(self)
     end
 
+    def slots
+      @slots ||= Slots.new(self)
+    end
+
     def users
       @users ||= Users.new(self)
     end
