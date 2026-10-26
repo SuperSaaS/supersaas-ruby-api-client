@@ -63,6 +63,16 @@ module Supersaas
       @groups ||= Groups.new(self)
     end
 
+    def hooks
+      @hooks ||= Hooks.new(self)
+    end
+
+    # Checks the credentials, returns true or raises Supersaas::Exception
+    def ping
+      get('/ping')
+      true
+    end
+
     def get(path, query = {})
       request(:get, path, {}, query)
     end
@@ -165,6 +175,8 @@ module Supersaas
 
       code = res.code.to_i
       case code
+      when 204
+        {}
       when 200, 201
         if http_method == :post && res['location'] =~ /www.supersaas.com/
           res['location']
@@ -178,24 +190,24 @@ module Supersaas
 
     def handle_errors(code, res)
       print_errors(res)
-      case code
-      when 422
-        raise Supersaas::Exception, 'HTTP Request Error: Unprocessable Content'
-      when 400
-        raise Supersaas::Exception, 'HTTP Request Error: Bad Request'
-      when 401
-        raise Supersaas::Exception, 'HTTP Request Error: Unauthorised'
-      when 404
-        raise Supersaas::Exception, 'HTTP Request Error: Not Found'
-      when 501
-        raise Supersaas::Exception, 'Not yet implemented for service type schedule'
-      when 403
-        raise Supersaas::Exception, 'Unauthorized'
-      when 405
-        raise Supersaas::Exception, 'Not available for this schedule type'
-      else
-        raise Supersaas::Exception, "HTTP Request Error: #{code}"
-      end
+      message = case code
+                when 422 then 'HTTP Request Error: Unprocessable Content'
+                when 400 then 'HTTP Request Error: Bad Request'
+                when 401 then 'HTTP Request Error: Unauthorised'
+                when 404 then 'HTTP Request Error: Not Found'
+                when 501 then 'Not yet implemented for service type schedule'
+                when 403 then 'Unauthorized'
+                when 405 then 'Not available for this schedule type'
+                else "HTTP Request Error: #{code}"
+                end
+      raise Supersaas::Exception.new(message, status: code, errors: parsed_errors(res))
+    end
+
+    # The errors array of a JSON error body like {"errors":[{"status":"404","title":"Not found"}]}
+    def parsed_errors(res)
+      body = json_body(res)
+      errors = body['errors'] if body.is_a?(Hash)
+      errors.is_a?(Array) ? errors : []
     end
 
     def print_errors(res)

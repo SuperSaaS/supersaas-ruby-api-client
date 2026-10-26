@@ -110,6 +110,12 @@ Get all the fields available to user object:
 
     Supersaas::Client.instance.users.field_list #=> [<Supersaas::FieldList>, ...]
 
+#### List Input Fields of User object
+
+Get the fields that can be set when creating a user, each with a `required` flag:
+
+    Supersaas::Client.instance.users.input_field_list #=> [<Supersaas::FieldList>, ...]
+
 #### Create Appointment/Booking
 
 Create an appointment with `schedule_id`, and `user_id(optional)` (see API documentation on [create new](https://www.supersaas.com/info/dev/appointment_api#bookings_api)) appointment attributes and optional `form` and `webhook` params,
@@ -280,6 +286,30 @@ Get all the available fields of a schedule by `schedule_id`:
 
     Supersaas::Client.instance.schedules.field_list(12345) #=> [<Supersaas::FieldList>, ...]
 
+#### List Input Fields of a Schedule
+
+Get the fields that can be set when creating a booking on a schedule by `schedule_id`, each with a `required` flag:
+
+    Supersaas::Client.instance.schedules.input_field_list(12345) #=> [<Supersaas::FieldList>, ...]
+
+#### Check Credentials
+
+Check that the account name and API key are valid. Returns `true`, or raises `Supersaas::Exception` with status 401:
+
+    Supersaas::Client.instance.ping #=> true
+
+#### Create Webhook
+
+Create a webhook with `target_url`, `event` and `parent_id` ([see](https://www.supersaas.com/info/dev/webhooks)). The event is the trigger letter, e.g. `'U'` new user, `'M'` changed user, `'N'` new appointment, `'C'` changed appointment. The `parent_id` is the schedule id for appointment events, the super form id for form events, and the account id otherwise:
+
+    Supersaas::Client.instance.hooks.create('https://example.com/hook', 'N', 12345) #=> {"id"=>67, "parent_id"=>12345}
+
+#### Delete Webhook
+
+Delete a webhook by `hook_id` and `parent_id`:
+
+    Supersaas::Client.instance.hooks.delete(67, 12345) #=> {}
+
 
 ## Examples
 
@@ -320,10 +350,17 @@ The API Client raises a custom exception for HTTP errors and invalid input. Resc
       # Handle error
     end
 
-Some errors have more information and are printed to the log before raising the error e.g.
+For HTTP errors the exception also carries the status code and the errors the server returned:
 
-    appointment = Supersaas::Client.instance.appointments.create(12345, {bad_field_name: ''})
-    "Error 400, Bad request: unknown attribute 'bad_field_name' for Booking."
+    begin
+      Supersaas::Client.instance.slots.get(12345, 999)
+    rescue Supersaas::Exception => e
+      e.message #=> "HTTP Request Error: Not Found"
+      e.status  #=> 404
+      e.errors  #=> [{"status"=>"404", "title"=>"Not found"}]
+    end
+
+`errors` is an empty array when the response has no JSON error body. `status` is `nil` for errors raised before a request is sent, such as invalid input.
 
 ## Additional Information
 

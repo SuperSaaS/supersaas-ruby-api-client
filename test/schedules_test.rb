@@ -22,5 +22,10 @@ module Supersaas
       refute_nil @client.schedules.field_list(12_345)
       assert_last_request_path '/api/field_list.json?schedule_id=12345'
     end
+
+    def test_input_field_list
+      refute_nil @client.schedules.input_field_list(12_345)
+      assert_last_request_path '/api/input_field_list.json?schedule_id=12345'
+    end
   end
 end
