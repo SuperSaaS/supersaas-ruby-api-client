@@ -112,7 +112,7 @@ module Supersaas
 
     private
 
-    # description is for resource schedules, quantity (number of places) for capacity schedules; form_id connects a form
+    # Input attributes only. description is for resource schedules, quantity (number of places) for capacity schedules
     def booking_params(attributes)
       {
         start: attributes[:start],
@@ -132,8 +132,7 @@ module Supersaas
         resource_id: attributes[:resource_id],
         slot_id: attributes[:slot_id],
         description: attributes[:description],
-        quantity: attributes[:quantity],
-        form_id: attributes[:form_id]
+        quantity: attributes[:quantity]
       }
     end
 
