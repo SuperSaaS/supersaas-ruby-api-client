@@ -87,5 +87,12 @@ module Supersaas
       elapsed_time = end_time - start_time
       assert_operator elapsed_time, :<, 4.1, "Expected throttling, #{elapsed_time} seconds"
     end
+
+    # 405 means "wrong schedule type" both ways: resources on a capacity schedule, slots on any other type
+    def test_405_message_is_generic
+      response = Struct.new(:body).new('{"errors":[{"status":"405"}]}')
+      error = assert_raises(Supersaas::Exception) { @client.send(:handle_errors, 405, response) }
+      assert_equal 'Not available for this schedule type', error.message
+    end
   end
 end

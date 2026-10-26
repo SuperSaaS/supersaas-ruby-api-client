@@ -188,7 +188,7 @@ List the slots of a capacity type schedule by `schedule_id`, with optional `star
 
     Supersaas::Client.instance.slots.list(12345, '2018-01-31 00:00:00', '2019-01-31 00:00:00', 50) #=> [<Supersaas::Slot>, ...]
 
-_Note: slots only work for capacity type schedules, other schedule types raise an error._
+_Note: slots only work for capacity type schedules. On other schedule types the API returns 405, which raises `Supersaas::Exception` with "Not available for this schedule type"._
 
 #### Get Slot
 

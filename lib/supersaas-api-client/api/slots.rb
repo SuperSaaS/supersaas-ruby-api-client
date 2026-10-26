@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Supersaas
-  # REF: https://www.supersaas.com/info/dev/appointment_api
+  # REF: https://www.supersaas.com/info/dev/appointment_api#slots_api
   # Only available for capacity type schedules.
   class Slots < BaseApi
     def list(schedule_id, start_time = nil, finish = nil, limit = nil, offset = nil)

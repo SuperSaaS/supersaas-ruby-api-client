@@ -192,7 +192,7 @@ module Supersaas
       when 403
         raise Supersaas::Exception, 'Unauthorized'
       when 405
-        raise Supersaas::Exception, 'Not available for capacity type schedule'
+        raise Supersaas::Exception, 'Not available for this schedule type'
       else
         raise Supersaas::Exception, "HTTP Request Error: #{code}"
       end
