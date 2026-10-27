@@ -77,7 +77,7 @@ module Supersaas
 
     private
 
-    # The rate limiter allows a maximum of 1 requests within the specified time window
+    # The rate limiter allows at most MAX_REQUESTS requests per WINDOW_SIZE seconds
     WINDOW_SIZE = 1 # seconds
     MAX_REQUESTS = 4
 
