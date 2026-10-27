@@ -271,7 +271,7 @@ The `Client` also provides a `last_request` attribute containing the `Net::HTTP`
 
 The headers, body, path, etc. of the last request can be inspected for assertion in tests, or for troubleshooting failed API requests.
 
-For additional troubleshooting, the client can be configured with the `verbose` option, which will `puts` any JSON contents in the request and response, e.g.
+For additional troubleshooting, the client can be configured with the `verbose` option, which will `puts` any JSON contents in the request and response. Password values in the request are shown as `[FILTERED]`; the request itself is sent unchanged. E.g.
 
     Supersaas::Client.instance.verbose = true
 
