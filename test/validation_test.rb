@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'test_helper'
+require 'open3'
 
 module Supersaas
   # Invalid input raises Supersaas::Exception before any request is made
@@ -73,6 +74,28 @@ module Supersaas
     def test_invalid_http_method
       error = assert_raises(Supersaas::Exception) { @client.send(:request, :patch, '/test') }
       assert_equal 'Invalid HTTP Method: patch. Only `:get`, `:post`, `:put`, `:delete` supported.', error.message
+    end
+
+    # Runs in a fresh Ruby process, because the test suite itself loads 'date' (via 'time')
+    def test_invalid_datetime_raises_supersaas_exception_without_date_loaded
+      script = <<~RUBY
+        abort 'date was already loaded' if defined?(DateTime)
+        require 'supersaas-api-client'
+        client = Supersaas::Client.new
+        client.account_name = 'accnt'
+        client.api_key = 'xxxxxxxxxxxxxxxxxxxxxx'
+        client.dry_run = true
+        begin
+          client.appointments.available(12_345, '2018-01-31')
+          abort 'no exception raised'
+        rescue Supersaas::Exception
+          nil
+        end
+        client.appointments.available(12_345, DateTime.new(2018, 1, 31, 10, 0, 0))
+      RUBY
+      lib = File.expand_path('../lib', __dir__)
+      output, status = Open3.capture2e({ 'RUBYOPT' => nil }, RbConfig.ruby, '--disable-gems', '-I', lib, '-e', script)
+      assert status.success?, output
     end
   end
 end
