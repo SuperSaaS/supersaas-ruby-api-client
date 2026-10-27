@@ -67,24 +67,7 @@ module Supersaas
         webhook: webhook,
         user_id: validate_id(user_id),
         form: form ? true : nil,
-        booking: {
-          start: attributes[:start],
-          finish: attributes[:finish],
-          email: attributes[:email],
-          res_name: attributes[:name],
-          full_name: attributes[:full_name],
-          address: attributes[:address],
-          mobile: attributes[:mobile],
-          phone: attributes[:phone],
-          country: attributes[:country],
-          field_1: attributes[:field_1],
-          field_2: attributes[:field_2],
-          field_1_r: attributes[:field_1_r],
-          field_2_r: attributes[:field_2_r],
-          super_field: attributes[:super_field],
-          resource_id: attributes[:resource_id],
-          slot_id: attributes[:slot_id]
-        }
+        booking: booking_params(attributes)
       }
       params[:booking].compact!
       client.post(path, params)
@@ -94,24 +77,7 @@ module Supersaas
       path = "/bookings/#{validate_id(appointment_id)}"
       params = {
         schedule_id: schedule_id,
-        booking: {
-          start: attributes[:start],
-          finish: attributes[:finish],
-          email: attributes[:email],
-          res_name: attributes[:name],
-          full_name: attributes[:full_name],
-          address: attributes[:address],
-          mobile: attributes[:mobile],
-          phone: attributes[:phone],
-          country: attributes[:country],
-          field_1: attributes[:field_1],
-          field_2: attributes[:field_2],
-          field_1_r: attributes[:field_1_r],
-          field_2_r: attributes[:field_2_r],
-          super_field: attributes[:super_field],
-          resource_id: attributes[:resource_id],
-          slot_id: attributes[:slot_id]
-        }
+        booking: booking_params(attributes)
       }
 
       params.merge!(form: form) if form
@@ -145,6 +111,31 @@ module Supersaas
     end
 
     private
+
+    # Input attributes only. description is for resource schedules, quantity (number of places) for capacity schedules, form_id attaches an existing form
+    def booking_params(attributes)
+      {
+        start: attributes[:start],
+        finish: attributes[:finish],
+        email: attributes[:email],
+        res_name: attributes[:name],
+        full_name: attributes[:full_name],
+        address: attributes[:address],
+        mobile: attributes[:mobile],
+        phone: attributes[:phone],
+        country: attributes[:country],
+        field_1: attributes[:field_1],
+        field_2: attributes[:field_2],
+        field_1_r: attributes[:field_1_r],
+        field_2_r: attributes[:field_2_r],
+        super_field: attributes[:super_field],
+        resource_id: attributes[:resource_id],
+        slot_id: attributes[:slot_id],
+        description: attributes[:description],
+        quantity: attributes[:quantity],
+        form_id: attributes[:form_id]
+      }
+    end
 
     def map_slots_or_bookings(obj, slot = false)
       if obj.is_a?(Array) && slot
