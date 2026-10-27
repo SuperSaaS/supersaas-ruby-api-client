@@ -7,7 +7,7 @@ puts '# SuperSaaS Schedules Example'
 
 unless Supersaas::Client.instance.account_name && Supersaas::Client.instance.api_key
   puts 'ERROR! Missing account credentials. Rerun the script with your credentials, e.g.'
-  puts 'SSS_API_ACCOUNT_NAME=<myaccountname> SSS_API_KEY=<xxxxxxxxxxxxxxxxxxxxxx> ./examples/users.rb'
+  puts 'SSS_API_ACCOUNT_NAME=<myaccountname> SSS_API_KEY=<xxxxxxxxxxxxxxxxxxxxxx> ./examples/schedules.rb'
   return
 end
 
@@ -21,18 +21,18 @@ puts '#### Supersaas::Client.instance.schedules.list'
 schedules = Supersaas::Client.instance.schedules.list
 
 puts 'listing schedule resources...'
-[10, schedules.size].min&.times do |i|
+[10, schedules.size].min.times do |i|
   puts "#### Supersaas::Client.instance.schedules.resources(#{schedules[i].id})"
-  # Capacity schedules bomb
+  # Capacity type schedules have no resources, the API returns an error for them
   begin
     Supersaas::Client.instance.schedules.resources(schedules[i].id)
-  rescue StandardError
-    next
+  rescue Supersaas::Exception => e
+    puts "Skipped: #{e.message}"
   end
 end
 
-puts 'puts listing fields...'
-[10, schedules.size].min&.times do |i|
+puts 'listing fields...'
+[10, schedules.size].min.times do |i|
   puts "#### Supersaas::Client.instance.schedules.field_list(#{schedules[i].id})"
   Supersaas::Client.instance.schedules.field_list(schedules[i].id)
 end

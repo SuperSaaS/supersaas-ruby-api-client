@@ -26,35 +26,29 @@ else
   return
 end
 
-# give
 user_id = ENV.fetch('SSS_API_USER', nil)
 
 unless user_id
   puts 'User is created and then deleted at the end'
-  params = { full_name: 'Example', name: 'example@example.com', email: 'example@example.com', api_key: 'example' }
+  params = { full_name: 'Example', name: 'example@example.com', email: 'example@example.com' }
   user = Supersaas::Client.instance.users.create(params)
   user_id = user.match(%r{users/(\d+)\.json})[1]
   puts "#New user created #{user_id}"
 end
 
-description = nil
-if user_id
-  description = '1234567890.'
-  params = { full_name: 'Example', description: description, name: 'example@example.com', email: 'example@example.com',
-             mobile: '555-5555', phone: '555-5555', address: 'addr' }
-  if show_slot
-    params[:slot_id] = ENV.fetch('SSS_API_SLOT', nil)
-  else
-    days = rand(1..30)
-    params[:start] = Time.now + (days * 24 * 60 * 60)
-    params[:finish] = params[:start] + (60 * 60)
-  end
-  puts 'creating new appointment...'
-  puts "#### Supersaas::Client.instance.appointments.create(#{schedule_id}, #{user_id}, {...})"
-  Supersaas::Client.instance.appointments.create(schedule_id, user_id, params)
+description = '1234567890.'
+params = { full_name: 'Example', description: description, name: 'example@example.com', email: 'example@example.com',
+           mobile: '555-5555', phone: '555-5555', address: 'addr' }
+if show_slot
+  params[:slot_id] = ENV.fetch('SSS_API_SLOT', nil)
 else
-  puts 'skipping create/update/delete (NO DESTRUCTIVE ACTIONS FOR SCHEDULE DATA)...'
+  days = rand(1..30)
+  params[:start] = Time.now + (days * 24 * 60 * 60)
+  params[:finish] = params[:start] + (60 * 60)
 end
+puts 'creating new appointment...'
+puts "#### Supersaas::Client.instance.appointments.create(#{schedule_id}, #{user_id}, {...})"
+Supersaas::Client.instance.appointments.create(schedule_id, user_id, params)
 
 puts 'listing appointments...'
 puts "#### Supersaas::Client.instance.appointments.list(#{schedule_id}, nil, nil, 25)"
@@ -64,7 +58,7 @@ appointments = Supersaas::Client.instance.appointments.list(schedule_id, nil, ni
 if appointments.size.positive?
   appointment_id = appointments.sample.id
   puts 'getting appointment...'
-  puts "#### Supersaas::Client.instance.appointments.get(#{appointment_id})"
+  puts "#### Supersaas::Client.instance.appointments.get(#{schedule_id}, #{appointment_id})"
   Supersaas::Client.instance.appointments.get(schedule_id, appointment_id)
 end
 
@@ -74,7 +68,7 @@ to = DateTime.now + 360_000
 puts "#### Supersaas::Client.instance.appointments.changes(#{schedule_id},
   '#{from.strftime('%Y-%m-%d %H:%M:%S')}', '#{to.strftime('%Y-%m-%d %H:%M:%S')}', #{show_slot || 'false'})"
 
-Supersaas::Client.instance.appointments.changes(schedule_id, from, show_slot)
+Supersaas::Client.instance.appointments.changes(schedule_id, from, to, show_slot)
 
 puts 'listing available...'
 from = DateTime.now
@@ -100,10 +94,10 @@ appointments.each do |appointment|
   Supersaas::Client.instance.appointments.update(schedule_id, appointment.id, { country: 'FR', address: 'Rue 1' })
 
   puts 'deleting appointment...'
-  puts "#### Supersaas::Client.instance.appointments.delete(#{schedule_id}. #{appointment.id})"
+  puts "#### Supersaas::Client.instance.appointments.delete(#{schedule_id}, #{appointment.id})"
   Supersaas::Client.instance.appointments.delete(schedule_id, appointment.id)
   break
 end
 
-# Puts delete user
+# Delete the user created above
 Supersaas::Client.instance.users.delete(user_id) unless ENV.fetch('SSS_API_USER', nil)

@@ -7,7 +7,7 @@ puts '# SuperSaaS Forms Example'
 
 unless Supersaas::Client.instance.account_name && Supersaas::Client.instance.api_key
   puts 'ERROR! Missing account credentials. Rerun the script with your credentials, e.g.'
-  puts '    SSS_API_ACCOUNT_NAME=<myaccountname> SSS_API_KEY=<xxxxxxxxxxxxxxxxxxxxxx> ./examples/appointments.rb'
+  puts '    SSS_API_ACCOUNT_NAME=<myaccountname> SSS_API_KEY=<xxxxxxxxxxxxxxxxxxxxxx> ./examples/forms.rb'
   return
 end
 
@@ -29,9 +29,13 @@ if template_forms.size.positive?
 
   puts 'listing forms from account'
   puts '#### Supersaas::Client.instance.forms.list'
-  form_id = Supersaas::Client.instance.forms.list(template_form_id).sample.id
+  form_id = Supersaas::Client.instance.forms.list(template_form_id).sample&.id
 end
 
-puts 'getting form...'
-puts "#### Supersaas::Client.instance.forms.get(#{form_id})"
-Supersaas::Client.instance.forms.get(form_id)
+if form_id
+  puts 'getting form...'
+  puts "#### Supersaas::Client.instance.forms.get(#{form_id})"
+  Supersaas::Client.instance.forms.get(form_id)
+else
+  puts '... no forms found'
+end

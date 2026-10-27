@@ -18,7 +18,7 @@ Supersaas::Client.instance.verbose = true
 
 puts 'creating new user...'
 puts '#### Supersaas::Client.instance.users.create({...})'
-params = { full_name: 'Example', name: 'example@example.com', email: 'example@example.com', api_key: 'example' }
+params = { full_name: 'Example', name: 'example@example.com', email: 'example@example.com' }
 Supersaas::Client.instance.users.create(params)
 new_user_id = nil
 
