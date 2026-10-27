@@ -69,7 +69,7 @@ Create a user with user attributes params `create(attributes, user_id = nil, web
 If webhook=true is present it will trigger any webhooks connected to the account.
 To avoid a ‘create’ action from being automatically interpreted as an ‘update’, you can add the parameter duplicate=raise, then error `422 Unprocessable Entity` will be raised.
 If in your database your user has id 1234 then you can supply a foreign key in format 1234fk in `user_id` (optional) which you can use to identify user:
-If validation fails for any field then error `422 Unprocessable Entity` will be raised.
+If validation fails for any field then error `422 Unprocessable Entity` will be raised and any additional information will be printed to your log.
 Data fields that you can supply can be found [here.](https://www.supersaas.com/info/dev/user_api)
 
     Supersaas::Client.instance.users.create({name: 'name@name.com', full_name: 'Example Name', email: 'example@example.com'}, '1234fk', true, 'raise') #=> http://www.supersaas.com/api/users/1234.json
