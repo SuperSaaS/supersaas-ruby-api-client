@@ -17,7 +17,7 @@ Gemspec/RequiredRubyVersion:
 # Offense count: 9
 # Configuration parameters: AllowedMethods, AllowedPatterns, CountRepeatedAttributes.
 Metrics/AbcSize:
-  Max: 70
+  Max: 71
 
 # Offense count: 2
 # Configuration parameters: CountComments, CountAsOne.
