@@ -298,6 +298,15 @@ Some errors have more information and are printed to the log before raising the 
 
 Contact: [support@supersaas.com](mailto:support@supersaas.com)
 
+## Development
+
+The `bin/` scripts are for working on the client itself and are not included in the gem:
+
+    $ bin/setup            # install the development dependencies
+    $ bin/console          # IRB session with the client loaded
+    $ bundle exec rake test
+    $ bundle exec rake lint
+
 ## Releases
 
 The package follows [semantic versioning](https://semver.org/), i.e. MAJOR.MINOR.PATCH.
