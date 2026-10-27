@@ -1,1 +1,31 @@
 inherit_from: .rubocop_todo.yml
+
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+
+# Public API: positional boolean parameters are part of released method signatures
+Style/OptionalBooleanParameter:
+  Exclude:
+    - 'lib/supersaas-api-client/api/appointments.rb'
+
+# field_1, field_2, field_1_r... are SuperSaaS API attribute names
+Naming/VariableNumber:
+  Exclude:
+    - 'lib/supersaas-api-client/api/appointments.rb'
+    - 'lib/supersaas-api-client/api/users.rb'
+    - 'lib/supersaas-api-client/models/appointment.rb'
+    - 'lib/supersaas-api-client/models/user.rb'
+    - 'test/**/*.rb'
+
+# The gem's entry point is named after the gem
+Naming/FileName:
+  Exclude:
+    - 'lib/supersaas-api-client.rb'
+
+Style/Documentation:
+  Enabled: false
+
+# Development dependencies are declared in the gemspec
+Gemspec/DevelopmentDependencies:
+  EnforcedStyle: gemspec

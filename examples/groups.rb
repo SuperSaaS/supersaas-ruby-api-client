@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 # frozen_string_literal: true
 
 require 'supersaas-api-client'
@@ -6,7 +7,7 @@ puts '# SuperSaaS Groups Example'
 
 unless Supersaas::Client.instance.account_name && Supersaas::Client.instance.api_key
   puts 'ERROR! Missing account credentials. Rerun the script with your credentials, e.g.'
-  puts 'SSS_API_ACCOUNT_NAME=<myaccountname> SSS_API_KEY=<xxxxxxxxxxxxxxxxxxxxxx> ./examples/users.rb'
+  puts 'SSS_API_ACCOUNT_NAME=<myaccountname> SSS_API_KEY=<xxxxxxxxxxxxxxxxxxxxxx> ./examples/groups.rb'
   return
 end
 

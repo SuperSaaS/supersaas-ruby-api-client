@@ -77,7 +77,7 @@ module Supersaas
 
     private
 
-    # The rate limiter allows a maximum of 1 requests within the specified time window
+    # The rate limiter allows at most MAX_REQUESTS requests per WINDOW_SIZE seconds
     WINDOW_SIZE = 1 # seconds
     MAX_REQUESTS = 4
 
@@ -138,7 +138,7 @@ module Supersaas
       if verbose
         puts '### SuperSaaS Client Request:'
         puts "#{http_method} #{path}"
-        puts params.to_json
+        puts filter_secrets(params).to_json
         puts '------------------------------'
       end
 
@@ -216,6 +216,14 @@ module Supersaas
         v = v.compact if v.is_a?(Hash)
         v.nil? || v == ''
       end
+    end
+
+    # A copy of the params with password values replaced, for verbose output only
+    def filter_secrets(value)
+      return value.map { |v| filter_secrets(v) } if value.is_a?(Array)
+      return value unless value.is_a?(Hash)
+
+      value.each_with_object({}) { |(k, v), h| h[k] = k.to_s == 'password' ? '[FILTERED]' : filter_secrets(v) }
     end
 
     class Configuration

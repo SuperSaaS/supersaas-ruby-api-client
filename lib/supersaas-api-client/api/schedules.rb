@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Supersaas
+  # REF: https://www.supersaas.com/info/dev/information_api
   class Schedules < BaseApi
-    # REF: https://www.supersaas.com/info/dev/information_api
     def list
       path = '/schedules'
       res = client.get(path)

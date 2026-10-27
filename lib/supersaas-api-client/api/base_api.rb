@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'date'
+
 module Supersaas
   class BaseApi
     attr_accessor :client

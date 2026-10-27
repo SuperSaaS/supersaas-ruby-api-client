@@ -9,4 +9,12 @@ Rake::TestTask.new(:test) do |t|
   t.test_files = FileList['test/**/*_test.rb']
 end
 
+begin
+  require 'rubocop/rake_task'
+  RuboCop::RakeTask.new(:lint)
+rescue LoadError
+  desc 'Run RuboCop (not installed)'
+  task(:lint) { abort 'RuboCop is not available, run `bundle install` first.' }
+end
+
 task default: :test
