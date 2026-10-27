@@ -189,7 +189,6 @@ module Supersaas
     end
 
     def handle_errors(code, res)
-      print_errors(res)
       message = case code
                 when 422 then 'HTTP Request Error: Unprocessable Content'
                 when 400 then 'HTTP Request Error: Bad Request'
@@ -208,15 +207,6 @@ module Supersaas
       body = json_body(res)
       errors = body['errors'] if body.is_a?(Hash)
       errors.is_a?(Array) ? errors : []
-    end
-
-    def print_errors(res)
-      json_body = json_body(res)
-      return unless json_body[:errors]
-
-      errors each do |error|
-        puts "Error code: #{error['code']}, #{error['title']}"
-      end
     end
 
     def json_body(res)
