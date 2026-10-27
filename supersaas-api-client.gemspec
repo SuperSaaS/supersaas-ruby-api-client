@@ -14,15 +14,21 @@ Gem::Specification.new do |spec|
   spec.description   = 'Online appointment scheduling for any type of business. Flexible and affordable booking software that can be integrated into any site. Free basic version.'
   spec.homepage      = 'https://www.supersaas.com'
   spec.license       = 'MIT'
+  spec.required_ruby_version = '>= 2.5'
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^test/}) }
-  spec.bindir        = 'bin'
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  spec.metadata['source_code_uri'] = 'https://github.com/SuperSaaS/supersaas-ruby-api-client'
+  spec.metadata['bug_tracker_uri'] = 'https://github.com/SuperSaaS/supersaas-ruby-api-client/issues'
+  spec.metadata['documentation_uri'] = 'https://www.supersaas.com/info/dev'
+
+  # Ship the library and its documentation only. bin/console and bin/setup are development helpers,
+  # not executables to install on the user's PATH.
+  spec.files         = Dir['lib/**/*.rb', 'examples/*.rb', 'README.md', 'LICENSE']
   spec.require_paths = ['lib']
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'minitest'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rubocop'
+
   spec.metadata['rubygems_mfa_required'] = 'true'
 end
