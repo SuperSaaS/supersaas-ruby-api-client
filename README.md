@@ -69,7 +69,7 @@ Create a user with user attributes params `create(attributes, user_id = nil, web
 If webhook=true is present it will trigger any webhooks connected to the account.
 To avoid a ‘create’ action from being automatically interpreted as an ‘update’, you can add the parameter duplicate=raise, then error `422 Unprocessable Entity` will be raised.
 If in your database your user has id 1234 then you can supply a foreign key in format 1234fk in `user_id` (optional) which you can use to identify user:
-If validation fails for any field then error `422 Unprocessable Entity` will be raised and any additional information will be printed to your log.
+If validation fails for any field then error `422 Unprocessable Entity` will be raised. The server's explanation is in the exception's `errors`, see [Error Handling](#error-handling).
 Data fields that you can supply can be found [here.](https://www.supersaas.com/info/dev/user_api)
 
     Supersaas::Client.instance.users.create({name: 'name@name.com', full_name: 'Example Name', email: 'example@example.com'}, '1234fk', true, 'raise') #=> http://www.supersaas.com/api/users/1234.json
@@ -110,12 +110,22 @@ Get all the fields available to user object:
 
     Supersaas::Client.instance.users.field_list #=> [<Supersaas::FieldList>, ...]
 
+#### List Input Fields of User object
+
+Get the fields that can be set when creating a user, each with a `required` flag:
+
+    Supersaas::Client.instance.users.input_field_list #=> [<Supersaas::FieldList>, ...]
+
 #### Create Appointment/Booking
 
 Create an appointment with `schedule_id`, and `user_id(optional)` (see API documentation on [create new](https://www.supersaas.com/info/dev/appointment_api#bookings_api)) appointment attributes and optional `form` and `webhook` params,
 `create(schedule_id, user_id, attributes, form = nil, webhook = nil)`:
 
     Supersaas::Client.instance.appointments.create(12345, 67890, {full_name: 'Example Name', email: 'example@example.com', slot_id: 12345}, true, true) #=> http://www.supersaas.com/api/bookings/12345.json
+
+**Input attributes** are sent on create and update: `start`, `finish`, `name`, `full_name`, `email`, `address`, `mobile`, `phone`, `country`, `field_1`, `field_2`, `field_1_r`, `field_2_r`, `super_field`, `description` and `form_id`, plus what is booked: `resource_id` on a resource schedule, or `slot_id` and `quantity` (number of places) on a capacity schedule. Any other attribute is not sent. The API does not support creating bookings on service schedules.
+
+**Read-only attributes** are returned when reading appointments but never sent: `id`, `created_on`, `updated_on`, `created_by`, `updated_by`, `user_id`, `deleted`, `res_name`, `service_id`, `service_name`, `waitlisted`, and `form` when reading with `form` set.
 
 #### Update Appointment/Booking
 
@@ -181,6 +191,41 @@ Get range of appointments by `schedule_id`, with `today`, `from` time, `to` time
 
     Supersaas::Client.instance.appointments.range(12345, false, '2018-01-31 00:00:00', '2019-01-31 00:00:00', true) #=> [<Supersaas::Appointment>, ...]/[<Supersaas::Slot>, ...]
 
+#### List Slots
+
+List the slots of a capacity type schedule by `schedule_id`, with optional `start_time`, `finish`, `limit` (default 100, max 2500) and `offset` view params,
+`list(schedule_id, start_time = nil, finish = nil, limit = nil, offset = nil)`:
+
+    Supersaas::Client.instance.slots.list(12345, '2018-01-31 00:00:00', '2019-01-31 00:00:00', 50) #=> [<Supersaas::Slot>, ...]
+
+_Note: slots only work for capacity type schedules. On other schedule types the API returns 405, which raises `Supersaas::Exception` with "Not available for this schedule type"._
+
+#### Get Slot
+
+Get a single slot by `schedule_id` and `slot_id`:
+
+    Supersaas::Client.instance.slots.get(12345, 67890) #=> <Supersaas::Slot>
+
+#### Create Slot
+
+Create a slot with `schedule_id` and slot attributes (`start`, `finish`, `title`, `description`, `location`, `capacity`, `price`, `color`),
+`create(schedule_id, attributes)`. A `capacity` of `'-'` means unlimited, `0` means no places:
+
+    Supersaas::Client.instance.slots.create(12345, {start: '2018-01-31 14:00:00', finish: '2018-01-31 15:00:00', title: 'Yoga', capacity: 10}) #=> http://www.supersaas.com/api/slots/67890.json
+
+#### Update Slot
+
+Update a slot by `schedule_id` and `slot_id` with slot attributes, see the above link,
+`update(schedule_id, slot_id, attributes)`:
+
+    Supersaas::Client.instance.slots.update(12345, 67890, {title: 'Advanced Yoga', capacity: '-'}) #=> {}
+
+#### Delete Slot
+
+Delete a single slot by `schedule_id` and `slot_id`. Bookings on the slot are deleted as well:
+
+    Supersaas::Client.instance.slots.delete(12345, 67890) #=> {}
+
 #### List Template Forms
 
 Get all forms by template `superform_id`, with `from_time`, and `user` params ([see](https://www.supersaas.com/info/dev/form_api)) and `limit`/`offset` pagination params:
@@ -245,6 +290,30 @@ Get all the available fields of a schedule by `schedule_id`:
 
     Supersaas::Client.instance.schedules.field_list(12345) #=> [<Supersaas::FieldList>, ...]
 
+#### List Input Fields of a Schedule
+
+Get the fields that can be set when creating a booking on a schedule by `schedule_id`, each with a `required` flag:
+
+    Supersaas::Client.instance.schedules.input_field_list(12345) #=> [<Supersaas::FieldList>, ...]
+
+#### Check Credentials
+
+Check that the account name and API key are valid. Returns `true`, or raises `Supersaas::Exception` with status 401:
+
+    Supersaas::Client.instance.ping #=> true
+
+#### Create Webhook
+
+Create a webhook with `target_url`, `event` and `parent_id` ([see](https://www.supersaas.com/info/dev/webhooks)). The event is the trigger letter, e.g. `'U'` new user, `'M'` changed user, `'N'` new appointment, `'C'` changed appointment. The `parent_id` is the schedule id for appointment events, the super form id for form events, and the account id otherwise:
+
+    Supersaas::Client.instance.hooks.create('https://example.com/hook', 'N', 12345) #=> {"id"=>67, "parent_id"=>12345}
+
+#### Delete Webhook
+
+Delete a webhook by `hook_id` and `parent_id`:
+
+    Supersaas::Client.instance.hooks.delete(67, 12345) #=> {}
+
 
 ## Examples
 
@@ -285,10 +354,17 @@ The API Client raises a custom exception for HTTP errors and invalid input. Resc
       # Handle error
     end
 
-Some errors have more information and are printed to the log before raising the error e.g.
+For HTTP errors the exception also carries the status code and the errors the server returned:
 
-    appointment = Supersaas::Client.instance.appointments.create(12345, {bad_field_name: ''})
-    "Error 400, Bad request: unknown attribute 'bad_field_name' for Booking."
+    begin
+      Supersaas::Client.instance.slots.get(12345, 999)
+    rescue Supersaas::Exception => e
+      e.message #=> "HTTP Request Error: Not Found"
+      e.status  #=> 404
+      e.errors  #=> [{"status"=>"404", "title"=>"Not found"}]
+    end
+
+`errors` is an empty array when the response has no JSON error body. `status` is `nil` for errors raised before a request is sent, such as invalid input.
 
 ## Additional Information
 

@@ -87,5 +87,61 @@ module Supersaas
       elapsed_time = end_time - start_time
       assert_operator elapsed_time, :<, 4.1, "Expected throttling, #{elapsed_time} seconds"
     end
+
+    # 405 means "wrong schedule type" both ways: resources on a capacity schedule, slots on any other type
+    def test_405_message_is_generic
+      response = Struct.new(:body).new('{"errors":[{"status":"405"}]}')
+      error = assert_raises(Supersaas::Exception) { @client.send(:handle_errors, 405, response) }
+      assert_equal 'Not available for this schedule type', error.message
+    end
+
+    def test_ping
+      @client.account_name = 'Test'
+      @client.api_key = 'testing123'
+      assert_equal true, @client.ping
+      assert_equal 'GET', @client.last_request.method
+      assert_equal '/api/ping.json', @client.last_request.path
+    end
+
+    # The messages are part of the released behaviour; status and errors are extra details
+    def test_error_messages_unchanged
+      {
+        422 => 'HTTP Request Error: Unprocessable Content',
+        400 => 'HTTP Request Error: Bad Request',
+        401 => 'HTTP Request Error: Unauthorised',
+        404 => 'HTTP Request Error: Not Found',
+        501 => 'Not yet implemented for service type schedule',
+        403 => 'Unauthorized',
+        500 => 'HTTP Request Error: 500'
+      }.each do |code, message|
+        response = Struct.new(:body).new('')
+        error = assert_raises(Supersaas::Exception) { @client.send(:handle_errors, code, response) }
+        assert_equal message, error.message
+        assert_equal code, error.status
+        assert_equal [], error.errors
+      end
+    end
+
+    def test_error_details
+      response = Struct.new(:body).new('{"errors":[{"status":"404","title":"Not found"}]}')
+      error = assert_raises(Supersaas::Exception) { @client.send(:handle_errors, 404, response) }
+      assert_equal 'HTTP Request Error: Not Found', error.message
+      assert_equal 404, error.status
+      assert_equal [{ 'status' => '404', 'title' => 'Not found' }], error.errors
+    end
+
+    def test_error_details_not_json
+      response = Struct.new(:body).new('<html>Bad gateway</html>')
+      error = assert_raises(Supersaas::Exception) { @client.send(:handle_errors, 502, response) }
+      assert_equal 'HTTP Request Error: 502', error.message
+      assert_equal [], error.errors
+    end
+
+    def test_exception_without_details
+      error = Supersaas::Exception.new('message')
+      assert_equal 'message', error.message
+      assert_nil error.status
+      assert_equal [], error.errors
+    end
   end
 end

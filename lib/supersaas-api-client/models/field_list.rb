@@ -2,7 +2,7 @@
 
 module Supersaas
   class FieldList < BaseModel
-    attr_accessor :name, :type, :label, :advanced
+    attr_accessor :name, :type, :label, :advanced, :required
     attr_reader :spec
 
     def spec=(value)

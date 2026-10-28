@@ -52,6 +52,13 @@ module Supersaas
       res.map { |attributes| Supersaas::FieldList.new(attributes) }
     end
 
+    # The fields that can be set when creating a user
+    def input_field_list
+      path = '/input_field_list'
+      res = client.get(path)
+      res.map { |attributes| Supersaas::FieldList.new(attributes) }
+    end
+
     private
 
     def user_path(user_id)
