@@ -37,6 +37,20 @@ module Supersaas
       assert_last_request_path "/api/bookings/#{@appointment_id}.json"
     end
 
+    def test_create_sends_description_quantity_and_form_id
+      attributes = { start: '2026-11-02 10:00:00', description: 'Court 2', quantity: 3, form_id: 7 }
+      @client.appointments.create(@schedule_id, @user_id, attributes)
+      booking = JSON.parse(@client.last_request.body)['booking']
+      assert_equal({ 'start' => '2026-11-02 10:00:00', 'description' => 'Court 2', 'quantity' => 3, 'form_id' => 7 },
+                   booking)
+    end
+
+    def test_update_sends_description_quantity_and_form_id
+      @client.appointments.update(@schedule_id, @appointment_id, { description: 'Court 2', quantity: 3, form_id: 7 })
+      booking = JSON.parse(@client.last_request.body)['booking']
+      assert_equal({ 'description' => 'Court 2', 'quantity' => 3, 'form_id' => 7 }, booking)
+    end
+
     def test_agenda
       refute_nil @client.appointments.agenda(@schedule_id, @user_id).inspect
       assert_last_request_path "/api/agenda/#{@schedule_id}.json?user=#{@user_id}"

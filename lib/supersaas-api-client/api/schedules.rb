@@ -22,5 +22,13 @@ module Supersaas
       res = client.get(path, query)
       res.map { |attributes| Supersaas::FieldList.new(attributes) }
     end
+
+    # The fields that can be set when creating a booking
+    def input_field_list(schedule_id)
+      path = '/input_field_list'
+      query = { schedule_id: validate_id(schedule_id) }
+      res = client.get(path, query)
+      res.map { |attributes| Supersaas::FieldList.new(attributes) }
+    end
   end
 end

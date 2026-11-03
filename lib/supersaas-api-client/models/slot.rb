@@ -2,7 +2,7 @@
 
 module Supersaas
   class Slot < BaseModel
-    attr_accessor :count, :description, :finish, :id, :location, :name, :start, :title
+    attr_accessor :capacity, :color, :count, :description, :finish, :id, :location, :name, :price, :start, :title
     attr_reader :bookings
 
     def bookings=(value)
